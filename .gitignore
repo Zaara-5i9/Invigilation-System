@@ -1,0 +1,223 @@
+# Django specific
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+migrations/__pycache__/
+*/migrations/__pycache__/
+staticfiles/
+static_root/
+media_root/
+
+# Django secret key and sensitive files
+secret_key.txt
+.secret
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.backup
+*.env
+config.ini
+settings_local.py
+
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.spyderproject
+.spyproject
+*.sublime-project
+*.sublime-workspace
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.history/
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Testing
+.coverage
+.pytest_cache/
+.tox/
+.nox/
+htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
+.cache/
+nosetests.xml
+coverage/
+.coverage.*
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Static files (collected)
+staticfiles/
+static_root/
+
+# Node.js (if using frontend tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# Documentation and development files (optional - uncomment if you don't want to track these)
+# docs/
+# *.md
+
+# Project-specific files
+# Backup files
+*.backup
+*.sql
+*.dump
+
+# Log files
+logs/
+*.log.*
+access.log
+error.log
+
+# Cache files
+.cache/
+*.cache
+
+# Compiled files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Archives
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Database files (additional)
+*.db
+*.sqlite
+*.sqlite3-shm
+*.sqlite3-wal
+
+# Email testing files
+sent_emails/
+email_logs/
+
+# Thesis and documentation files (uncomment if you don't want to track)
+# thesis_images/
+# *.pdf
+# *.docx
+# *.pptx
+
+# Development utilities
+.python-version
+.tool-versions
+.nvmrc
+
+# Security and credentials
+*.pem
+*.key
+*.crt
+*.p12
+credentials.json
+service-account.json
+
+# Monitoring and profiling
+.profiling/
+*.prof
+
+# Backup and temporary Django files
+*.orig
+*.rej
+.DS_Store?
+._*
