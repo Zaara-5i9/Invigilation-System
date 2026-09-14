@@ -1,0 +1,232 @@
+================================================================================
+                    SOFTWARE REQUIREMENTS SPECIFICATION
+                      INVIGILATION MANAGEMENT SYSTEM
+================================================================================
+
+1. SYSTEM OVERVIEW
+================================================================================
+The Invigilation Management System is a web-based application designed to 
+automate the process of faculty assignment for examination invigilation duties
+in educational institutions. The system ensures fair distribution of duties
+while preventing departmental bias and managing faculty availability.
+
+2. FUNCTIONAL REQUIREMENTS
+================================================================================
+
+2.1 USER MANAGEMENT
+-------------------
+FR-001: The system shall support two types of users: Administrators and Faculty
+FR-002: The system shall provide secure authentication with OTP verification
+FR-003: The system shall enforce password change on first login
+FR-004: The system shall maintain faculty profiles with department information
+FR-005: The system shall support batch creation of faculty accounts
+FR-006: The system shall send automated login credentials via email
+
+2.2 EXAM MANAGEMENT
+-------------------
+FR-007: The system shall allow creation of exams with course details
+FR-008: The system shall support multiple exam types (Mid-term, End-semester, Test)
+FR-009: The system shall manage exam halls with capacity and location details
+FR-010: The system shall configure exam sessions with hall assignments
+FR-011: The system shall track subject teachers for each exam
+FR-012: The system shall support bulk exam creation operations
+
+2.3 INVIGILATION ASSIGNMENT
+---------------------------
+FR-013: The system shall implement automated faculty allocation algorithm
+FR-014: The system shall prevent same-department faculty assignment
+FR-015: The system shall avoid assigning subject teachers to their own exams
+FR-016: The system shall check faculty availability against timetables
+FR-017: The system shall consider faculty leave status during allocation
+FR-018: The system shall prioritize faculty based on proximity and workload
+FR-019: The system shall provide manual assignment override capabilities
+FR-020: The system shall generate allocation suggestions for conflicts
+
+2.4 NOTIFICATION SYSTEM
+-----------------------
+FR-021: The system shall send email notifications for new assignments
+FR-022: The system shall send reminder emails before deadline expiry
+FR-023: The system shall notify administrators of declined assignments
+FR-024: The system shall alert administrators of expired assignments
+FR-025: The system shall provide customizable email templates
+
+2.5 FACULTY RESPONSE MANAGEMENT
+-------------------------------
+FR-026: Faculty shall be able to view their assigned duties
+FR-027: Faculty shall be able to confirm or decline assignments
+FR-028: Faculty shall be required to provide reasons for declining
+FR-029: The system shall enforce response deadlines (1.5 hours before exam)
+FR-030: The system shall track response timestamps
+
+2.6 TIMETABLE MANAGEMENT
+------------------------
+FR-031: Faculty shall be able to manage their teaching timetables
+FR-032: Administrators shall be able to view and edit any faculty timetable
+FR-033: The system shall support course-based timetable entries
+FR-034: The system shall validate timetable conflicts during allocation
+FR-035: The system shall support bulk timetable upload functionality
+
+2.7 LEAVE MANAGEMENT
+--------------------
+FR-036: Faculty shall be able to apply for leave requests
+FR-037: The system shall track leave status and dates
+FR-038: The system shall consider leave status during duty allocation
+FR-039: Administrators shall be able to view faculty leave records
+
+2.8 REPORTING AND ANALYTICS
+---------------------------
+FR-040: The system shall generate faculty workload statistics
+FR-041: The system shall provide department-wise allocation reports
+FR-042: The system shall track allocation success rates
+FR-043: The system shall generate bias prevention effectiveness reports
+FR-044: The system shall provide response rate analytics
+FR-045: The system shall support data export functionality
+
+2.9 AUDIT AND LOGGING
+---------------------
+FR-046: The system shall log all faculty actions with timestamps
+FR-047: The system shall track administrative actions
+FR-048: The system shall maintain assignment history
+FR-049: The system shall provide audit trail for compliance
+
+3. NON-FUNCTIONAL REQUIREMENTS
+================================================================================
+
+3.1 PERFORMANCE REQUIREMENTS
+----------------------------
+NFR-001: The system shall support up to 500 concurrent users
+NFR-002: Page load times shall not exceed 3 seconds
+NFR-003: Database queries shall be optimized with proper indexing
+NFR-004: The allocation algorithm shall complete within 30 seconds
+NFR-005: Email notifications shall be sent within 5 minutes
+
+3.2 SECURITY REQUIREMENTS
+-------------------------
+NFR-006: All user passwords shall be encrypted using Django's built-in hashing
+NFR-007: The system shall implement CSRF protection
+NFR-008: Session management shall follow Django security best practices
+NFR-009: OTP codes shall expire after 10 minutes
+NFR-010: The system shall log all authentication attempts
+
+3.3 USABILITY REQUIREMENTS
+--------------------------
+NFR-011: The interface shall be responsive and mobile-friendly
+NFR-012: The system shall provide intuitive navigation
+NFR-013: Error messages shall be clear and actionable
+NFR-014: The system shall support modern web browsers
+NFR-015: Help documentation shall be accessible within the application
+
+3.4 RELIABILITY REQUIREMENTS
+----------------------------
+NFR-016: The system shall have 99% uptime availability
+NFR-017: Data backup shall be performed daily
+NFR-018: The system shall handle graceful error recovery
+NFR-019: Database transactions shall maintain ACID properties
+
+3.5 SCALABILITY REQUIREMENTS
+----------------------------
+NFR-020: The system shall support horizontal scaling
+NFR-021: Database design shall accommodate growth
+NFR-022: The system shall support multiple institutions (future)
+
+4. TECHNICAL REQUIREMENTS
+================================================================================
+
+4.1 SOFTWARE REQUIREMENTS
+-------------------------
+- Python 3.8 or higher
+- Django 5.0.4 web framework
+- SQLite (development) / PostgreSQL (production)
+- Bootstrap 5.3.3 for frontend styling
+- Font Awesome 6.4.0 for icons
+- Chart.js for analytics visualization
+
+4.2 HARDWARE REQUIREMENTS (MINIMUM)
+----------------------------------
+Development Environment:
+- CPU: Dual-core processor (2.0 GHz)
+- RAM: 4 GB
+- Storage: 10 GB available space
+- Network: Broadband internet connection
+
+Production Environment:
+- CPU: Quad-core processor (2.5 GHz)
+- RAM: 8 GB
+- Storage: 50 GB SSD
+- Network: High-speed internet with static IP
+
+4.3 BROWSER COMPATIBILITY
+------------------------
+- Google Chrome 90+
+- Mozilla Firefox 88+
+- Microsoft Edge 90+
+- Safari 14+
+- Mobile browsers (iOS Safari, Chrome Mobile)
+
+5. SYSTEM CONSTRAINTS
+================================================================================
+
+5.1 TECHNICAL CONSTRAINTS
+-------------------------
+- Must use Django framework for consistency
+- Must maintain backward compatibility with existing data
+- Must support email integration for notifications
+- Must work within institutional network policies
+
+5.2 BUSINESS CONSTRAINTS
+-----------------------
+- Must comply with educational institution policies
+- Must maintain faculty privacy and data protection
+- Must support academic calendar requirements
+- Must integrate with existing institutional systems
+
+5.3 REGULATORY CONSTRAINTS
+--------------------------
+- Must comply with data protection regulations
+- Must maintain audit trails for compliance
+- Must ensure fair and unbiased allocation processes
+
+6. ASSUMPTIONS AND DEPENDENCIES
+================================================================================
+
+6.1 ASSUMPTIONS
+--------------
+- Faculty have access to email and internet
+- Institutional email system supports SMTP
+- Faculty will respond to assignments within deadlines
+- Network connectivity is reliable during exam periods
+
+6.2 DEPENDENCIES
+---------------
+- SMTP server configuration for email notifications
+- Institutional database integration (if required)
+- System administrator availability for maintenance
+- Faculty training on system usage
+
+7. ACCEPTANCE CRITERIA
+================================================================================
+
+7.1 FUNCTIONAL ACCEPTANCE
+------------------------
+- All functional requirements must be implemented and tested
+- Allocation algorithm must demonstrate bias prevention
+- Email notifications must be delivered reliably
+- User interfaces must be intuitive and responsive
+
+7.2 PERFORMANCE ACCEPTANCE
+-------------------------
+- System must handle peak load during exam periods
+- Response times must meet specified requirements
+- Data integrity must be maintained under all conditions
+
+7.3 SECURITY ACCEPTANCE
+----------------------
+- Security testing must pass all vulnerability assessments
+- Authentication mechanisms must be robust
+- Data protection measures must be effective
+
+================================================================================
+Document Version: 1.0
+Last Updated: April 2026
+Prepared for: Academic Thesis Documentation
+================================================================================
