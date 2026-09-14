@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Action Logs{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0"><i class="fas fa-history"></i> Faculty Action Logs</h4>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <form method="get" class="d-flex">
+                        <input type="text" name="faculty" class="form-control me-2" 
+                               placeholder="Search by name or employee ID" 
+                               value="{{ faculty_filter }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                        {% if faculty_filter %}
+                            <a href="{% url 'accounts:faculty_action_logs' %}" class="btn btn-secondary ms-2">
+                                <i class="fas fa-times"></i> Clear
+                            </a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Faculty</th>
+                            <th>Employee ID</th>
+                            <th>Department</th>
+                            <th>Action Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>{{ log.created_at|date:"d M Y, h:i A" }}</td>
+                            <td>
+                                <a href="{% url 'accounts:faculty_detail_admin' log.faculty.pk %}">
+                                    {{ log.faculty.user.get_full_name }}
+                                </a>
+                            </td>
+                            <td>{{ log.faculty.employee_id }}</td>
+                            <td>{{ log.faculty.department.code|default:"-" }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ log.action_type }}</span>
+                            </td>
+                            <td>{{ log.description|truncatewords:15 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No action logs found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if logs|length == 200 %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Showing most recent 200 logs. Use search to filter specific faculty.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

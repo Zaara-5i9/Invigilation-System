@@ -1,0 +1,37 @@
+<tr>
+  <td>
+    <select name="department_{{ row_index }}" class="form-select" required>
+      <option value="">Select Department</option>
+      {% for dept in departments %}
+        <option value="{{ dept.id }}">{{ dept.code }} - {{ dept.name }}</option>
+      {% endfor %}
+    </select>
+  </td>
+  <td>
+    <select name="year_{{ row_index }}" class="form-select" required>
+      <option value="">Year</option>
+      <option value="1">Year 1</option>
+      <option value="2">Year 2</option>
+      <option value="3">Year 3</option>
+      <option value="4">Year 4</option>
+    </select>
+  </td>
+  <td>
+    <select name="semester_{{ row_index }}" class="form-select" required>
+      <option value="">Sem</option>
+      <option value="1">Sem 1</option>
+      <option value="2">Sem 2</option>
+    </select>
+  </td>
+  <td>
+    <input type="text" name="code_{{ row_index }}" class="form-control" placeholder="e.g., CS101, R204GA05101" required>
+  </td>
+  <td>
+    <input type="text" name="name_{{ row_index }}" class="form-control" placeholder="e.g., Programming Fundamentals" required>
+  </td>
+  <td>
+    <button type="button" class="btn btn-outline-danger btn-sm delete-row" title="Remove Row">
+      <i class="fas fa-trash"></i>
+    </button>
+  </td>
+</tr>

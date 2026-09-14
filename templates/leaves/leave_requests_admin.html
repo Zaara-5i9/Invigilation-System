@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Leave Requests{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Leave Requests</h1>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Faculty</th>
+      <th>From</th>
+      <th>To</th>
+      <th>Status</th>
+      <th>Reason</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for l in leaves %}
+      <tr>
+        <td>{{ l.faculty.user.get_full_name|default:l.faculty.user.username }}</td>
+        <td>{{ l.start_date }}</td>
+        <td>{{ l.end_date }}</td>
+        <td>
+          {% if l.status == 'PENDING' %}
+            <span class="badge bg-warning text-dark">Pending</span>
+          {% elif l.status == 'APPROVED' %}
+            <span class="badge bg-success">Approved</span>
+          {% elif l.status == 'REJECTED' %}
+            <span class="badge bg-danger">Rejected</span>
+          {% else %}
+            <span class="badge bg-light text-dark">{{ l.status }}</span>
+          {% endif %}
+        </td>
+        <td>{{ l.reason|default:'-' }}</td>
+        <td>
+          {% if l.status == 'PENDING' %}
+            <a href="{% url 'leaves:approve_leave' l.pk %}" class="btn btn-sm btn-success" onclick="return confirm('Approve this leave request?');">Approve</a>
+            <a href="{% url 'leaves:reject_leave' l.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Reject this leave request?');">Reject</a>
+          {% else %}
+            <span class="text-muted">No actions</span>
+          {% endif %}
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6" class="text-center p-3">No leave requests.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

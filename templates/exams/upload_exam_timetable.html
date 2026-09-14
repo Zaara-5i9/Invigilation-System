@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Exam Timetable{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Upload Exam Timetable (CSV)</h1>
+<p>CSV columns:</p>
+<ul>
+  <li><code>department_code</code> (e.g., CSE, CSM, ECE)</li>
+  <li><code>course_code</code></li>
+  <li><code>course_name</code></li>
+  <li><code>exam_type</code> (MID, END, TEST)</li>
+  <li><code>year</code> (1-4)</li>
+  <li><code>semester</code></li>
+  <li><code>exam_date</code> (YYYY-MM-DD)</li>
+  <li><code>start_time</code> (HH:MM)</li>
+  <li><code>end_time</code> (HH:MM)</li>
+</ul>
+<p class="text-info"><strong>Note:</strong> The day of the week (e.g., Monday, Tuesday) will be automatically calculated from the exam date.</p>
+<form method="post" enctype="multipart/form-data" class="card card-body shadow-sm" style="max-width: 700px;">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <div class="mb-3">
+    {{ form.file.label_tag }}
+    {{ form.file }}
+    {% if form.file.errors %}
+      <div class="text-danger small">{{ form.file.errors|striptags }}</div>
+    {% endif %}
+  </div>
+  <button type="submit" class="btn btn-primary">Upload Exams</button>
+  <a href="{% url 'exams:exam_list' %}" class="btn btn-secondary">Back to Exams</a>
+</form>
+{% endblock %}

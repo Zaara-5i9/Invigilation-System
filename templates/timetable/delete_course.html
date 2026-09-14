@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Course{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-1" style="color: #dc3545;">
+        <i class="fas fa-trash me-2"></i>
+        Delete Course
+      </h2>
+      <p class="text-muted mb-0">Confirm course deletion</p>
+    </div>
+    <div>
+      <a href="{% url 'timetable:manage_courses' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Courses
+      </a>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Warning:</strong> This action cannot be undone. Deleting this course will permanently remove it from the system.
+          </div>
+
+          <div class="mb-4">
+            <h6 class="fw-bold">Course Details:</h6>
+            <div class="bg-light p-3 rounded">
+              <div class="row">
+                <div class="col-sm-4"><strong>Department:</strong></div>
+                <div class="col-sm-8">{{ course.department.code }} - {{ course.department.name }}</div>
+              </div>
+              <div class="row">
+                <div class="col-sm-4"><strong>Year/Semester:</strong></div>
+                <div class="col-sm-8">Year {{ course.year }}, Semester {{ course.semester }}</div>
+              </div>
+              <div class="row">
+                <div class="col-sm-4"><strong>Course Code:</strong></div>
+                <div class="col-sm-8">{{ course.code }}</div>
+              </div>
+              <div class="row">
+                <div class="col-sm-4"><strong>Course Name:</strong></div>
+                <div class="col-sm-8">{{ course.name }}</div>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-muted">
+            Are you sure you want to delete this course? This will remove it from the course catalog and may affect faculty timetables that reference this course.
+          </p>
+
+          <form method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger me-2">
+              <i class="fas fa-trash me-2"></i>Yes, Delete Course
+            </button>
+          </form>
+          <a href="{% url 'timetable:manage_courses' %}" class="btn btn-secondary">
+            <i class="fas fa-times me-2"></i>Cancel
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.card {
+  border-radius: 12px;
+}
+</style>
+{% endblock %}

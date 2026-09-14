@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Decline Assignment{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white">
+          <h4 class="mb-0"><i class="fas fa-times-circle"></i> Decline Invigilation Assignment</h4>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> You are about to decline this invigilation duty. The admin will be notified immediately for reassignment.
+          </div>
+
+          <h5 class="mb-3">Assignment Details</h5>
+          <table class="table table-bordered">
+            <tr>
+              <th width="30%">Faculty:</th>
+              <td>{{ assignment.faculty.user.get_full_name|default:assignment.faculty.user.username }} ({{ assignment.faculty.employee_id }})</td>
+            </tr>
+            <tr>
+              <th>Department:</th>
+              <td>{{ assignment.faculty.department.name|default:"-" }}</td>
+            </tr>
+            <tr>
+              <th>Exam:</th>
+              <td>{{ assignment.exam_session_hall.exam.course_code }} – {{ assignment.exam_session_hall.exam.course_name }}</td>
+            </tr>
+            <tr>
+              <th>Date & Time:</th>
+              <td>{{ assignment.exam_session_hall.exam.exam_date|date:"d M Y" }} | {{ assignment.exam_session_hall.exam.start_time }} - {{ assignment.exam_session_hall.exam.end_time }}</td>
+            </tr>
+            <tr>
+              <th>Venue:</th>
+              <td>{{ assignment.exam_session_hall.hall.name }}, {{ assignment.exam_session_hall.hall.block }}</td>
+            </tr>
+            <tr>
+              <th>Assigned On:</th>
+              <td>{{ assignment.assigned_at|date:"d M Y, h:i A" }}</td>
+            </tr>
+            <tr>
+              <th>Response Deadline:</th>
+              <td class="text-danger fw-bold">{{ assignment.confirmation_deadline|date:"d M Y, h:i A" }}</td>
+            </tr>
+          </table>
+
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="reason" class="form-label fw-bold">Reason for Declining <span class="text-danger">*</span></label>
+              <textarea name="reason" id="reason" class="form-control" rows="4" 
+                        placeholder="Please provide a reason for declining this assignment (e.g., prior commitment, health issue, etc.)" 
+                        required></textarea>
+              <small class="text-muted">This reason will be sent to the admin for record keeping.</small>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'exams:faculty_dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Cancel
+              </a>
+              <button type="submit" class="btn btn-danger">
+                <i class="fas fa-times-circle"></i> Confirm Decline
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

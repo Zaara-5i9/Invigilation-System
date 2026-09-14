@@ -1,0 +1,467 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports & Analytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h1 class="mb-1 fw-bold">
+                <i class="fas fa-chart-bar me-3" style="color: #667eea;"></i>
+                Reports & Analytics
+              </h1>
+              <p class="text-muted mb-0">Comprehensive insights into your invigilation system</p>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="{% url 'exams:faculty_workload_report' %}" class="btn btn-primary">
+                <i class="fas fa-users me-2"></i> Faculty Workload
+              </a>
+              <a href="{% url 'exams:department_statistics' %}" class="btn btn-info">
+                <i class="fas fa-building me-2"></i> Department Stats
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date Range Filter -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0">
+        <div class="card-header text-white border-0">
+          <h5 class="mb-0 fw-bold">
+            <i class="fas fa-filter me-2"></i>
+            Filter Reports
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label fw-medium">From Date</label>
+              <input type="date" name="date_from" class="form-control" value="{{ date_from|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-medium">To Date</label>
+              <input type="date" name="date_to" class="form-control" value="{{ date_to|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-4">
+              <button type="submit" class="btn btn-primary btn-lg w-100">
+                <i class="fas fa-search me-2"></i> Apply Filter
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row g-4 mb-5">
+    <div class="col-lg-3 col-md-6">
+      <div class="card h-100 border-0">
+        <div class="card-body text-center p-4">
+          <div class="mb-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle" 
+                 style="width: 80px; height: 80px; background: var(--primary-gradient);">
+              <i class="fas fa-calendar-check fa-2x text-white"></i>
+            </div>
+          </div>
+          <h2 class="fw-bold mb-2" style="color: #667eea;">{{ total_exams }}</h2>
+          <p class="text-muted mb-0 fw-medium">Total Exams</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card h-100 border-0">
+        <div class="card-body text-center p-4">
+          <div class="mb-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle" 
+                 style="width: 80px; height: 80px; background: var(--info-gradient);">
+              <i class="fas fa-clipboard-list fa-2x text-white"></i>
+            </div>
+          </div>
+          <h2 class="fw-bold mb-2" style="color: #a8edea;">{{ total_assignments }}</h2>
+          <p class="text-muted mb-0 fw-medium">Total Assignments</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card h-100 border-0">
+        <div class="card-body text-center p-4">
+          <div class="mb-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle" 
+                 style="width: 80px; height: 80px; background: var(--success-gradient);">
+              <i class="fas fa-check-circle fa-2x text-white"></i>
+            </div>
+          </div>
+          <h2 class="fw-bold mb-2" style="color: #4facfe;">{{ confirmed_assignments }}</h2>
+          <p class="text-muted mb-0 fw-medium">Confirmed</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card h-100 border-0">
+        <div class="card-body text-center p-4">
+          <div class="mb-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle" 
+                 style="width: 80px; height: 80px; background: var(--warning-gradient);">
+              <i class="fas fa-percentage fa-2x text-white"></i>
+            </div>
+          </div>
+          <h2 class="fw-bold mb-2" style="color: #43e97b;">{{ acceptance_rate }}%</h2>
+          <p class="text-muted mb-0 fw-medium">Acceptance Rate</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row 1 -->
+  <div class="row g-4 mb-5">
+    <div class="col-lg-6">
+      <div class="card h-100 border-0">
+        <div class="card-header text-white border-0">
+          <h5 class="mb-0 fw-bold">
+            <i class="fas fa-chart-line me-2"></i>
+            Monthly Exam Distribution
+          </h5>
+        </div>
+        <div class="card-body">
+          <div style="position: relative; height: 300px;">
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card h-100 border-0">
+        <div class="card-header text-white border-0">
+          <h5 class="mb-0 fw-bold">
+            <i class="fas fa-chart-pie me-2"></i>
+            Assignment Status Distribution
+          </h5>
+        </div>
+        <div class="card-body">
+          <div style="position: relative; height: 300px;">
+            <canvas id="statusChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Faculty Workload Chart -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0">
+        <div class="card-header text-white border-0">
+          <h5 class="mb-0 fw-bold">
+            <i class="fas fa-users me-2"></i>
+            Top 20 Faculty by Workload
+          </h5>
+        </div>
+        <div class="card-body">
+          <div style="position: relative; height: 400px;">
+            <canvas id="facultyChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Department Statistics Table -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0">
+        <div class="card-header text-white border-0">
+          <h5 class="mb-0 fw-bold">
+            <i class="fas fa-building me-2"></i>
+            Department-wise Statistics
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th class="fw-bold">Department</th>
+                  <th class="fw-bold">Total Exams</th>
+                  <th class="fw-bold">Active Faculty</th>
+                  <th class="fw-bold">Total Assignments</th>
+                  <th class="fw-bold">Avg per Faculty</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for dept in dept_stats %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="me-3">
+                          <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                               style="width: 40px; height: 40px; background: var(--primary-gradient);">
+                            <i class="fas fa-building text-white"></i>
+                          </div>
+                        </div>
+                        <div>
+                          <div class="fw-bold">{{ dept.code }}</div>
+                          <div class="small text-muted">{{ dept.name }}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge bg-primary px-3 py-2">{{ dept.total_exams }}</span>
+                    </td>
+                    <td>
+                      <span class="badge bg-info px-3 py-2">{{ dept.total_faculty }}</span>
+                    </td>
+                    <td>
+                      <span class="badge bg-success px-3 py-2">{{ dept.total_assignments }}</span>
+                    </td>
+                    <td>
+                      {% if dept.total_faculty > 0 %}
+                        <span class="badge bg-warning px-3 py-2">{{ dept.total_assignments|floatformat:1|default:"0" }}</span>
+                      {% else %}
+                        <span class="text-muted">N/A</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Faculty Workload Table -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0">
+        <div class="card-header text-white border-0">
+          <h5 class="mb-0 fw-bold">
+            <i class="fas fa-list me-2"></i>
+            Top Faculty Workload Details
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th class="fw-bold">Faculty Details</th>
+                  <th class="fw-bold">Department</th>
+                  <th class="fw-bold">Total Duties</th>
+                  <th class="fw-bold">Confirmed</th>
+                  <th class="fw-bold">Pending</th>
+                  <th class="fw-bold">Performance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in faculty_workload %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="me-3">
+                          <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                               style="width: 40px; height: 40px; background: var(--success-gradient);">
+                            <i class="fas fa-user text-white"></i>
+                          </div>
+                        </div>
+                        <div>
+                          <div class="fw-bold">{{ item.faculty__user__first_name }} {{ item.faculty__user__last_name }}</div>
+                          <div class="small text-muted">ID: {{ item.faculty__employee_id }}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge" style="background: var(--primary-gradient);">
+                        {{ item.faculty__department__code }}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge bg-primary px-3 py-2 fs-6">{{ item.total_duties }}</span>
+                    </td>
+                    <td>
+                      <span class="badge bg-success px-3 py-2 fs-6">{{ item.confirmed }}</span>
+                    </td>
+                    <td>
+                      <span class="badge bg-warning px-3 py-2 fs-6">{{ item.pending }}</span>
+                    </td>
+                    <td>
+                      {% if item.total_duties > 0 %}
+                        {% widthratio item.confirmed item.total_duties 100 as performance %}
+                        <div class="d-flex align-items-center">
+                          <div class="progress me-2" style="width: 60px; height: 8px;">
+                            <div class="progress-bar" 
+                                 style="width: {{ performance }}%; background: var(--success-gradient);">
+                            </div>
+                          </div>
+                          <small class="fw-bold">{{ performance }}%</small>
+                        </div>
+                      {% else %}
+                        <span class="text-muted">-</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="6" class="text-center py-5">
+                      <div class="mb-4">
+                        <i class="fas fa-chart-bar fa-4x text-muted opacity-50"></i>
+                      </div>
+                      <h5 class="text-muted">No data available for selected period</h5>
+                      <p class="text-muted mb-0">Try adjusting your date range filter</p>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Chart.js default configuration
+Chart.defaults.font.family = "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+Chart.defaults.font.size = 12;
+
+// Monthly Exam Distribution Chart
+const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+new Chart(monthlyCtx, {
+  type: 'line',
+  data: {
+    labels: {{ monthly_labels_json|safe }},
+    datasets: [{
+      label: 'Number of Exams',
+      data: {{ monthly_values_json|safe }},
+      borderColor: '#667eea',
+      backgroundColor: 'rgba(102, 126, 234, 0.1)',
+      borderWidth: 3,
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: '#667eea',
+      pointBorderColor: '#ffffff',
+      pointBorderWidth: 2,
+      pointRadius: 6,
+      pointHoverRadius: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+        labels: {
+          usePointStyle: true,
+          padding: 20
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(0, 0, 0, 0.05)'
+        }
+      },
+      x: {
+        grid: {
+          color: 'rgba(0, 0, 0, 0.05)'
+        }
+      }
+    }
+  }
+});
+
+// Assignment Status Pie Chart
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+new Chart(statusCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Confirmed', 'Declined', 'Pending'],
+    datasets: [{
+      data: [{{ confirmed_assignments }}, {{ declined_assignments }}, {{ pending_assignments }}],
+      backgroundColor: [
+        '#4facfe',
+        '#fa709a',
+        '#43e97b'
+      ],
+      borderWidth: 0,
+      hoverOffset: 10
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          padding: 20,
+          font: {
+            size: 14
+          }
+        }
+      }
+    },
+    cutout: '60%'
+  }
+});
+
+// Faculty Workload Bar Chart
+const facultyCtx = document.getElementById('facultyChart').getContext('2d');
+new Chart(facultyCtx, {
+  type: 'bar',
+  data: {
+    labels: {{ faculty_labels_json|safe }},
+    datasets: [{
+      label: 'Total Duties',
+      data: {{ faculty_values_json|safe }},
+      backgroundColor: 'rgba(102, 126, 234, 0.8)',
+      borderColor: '#667eea',
+      borderWidth: 2,
+      borderRadius: 8,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: {
+      legend: {
+        display: false
+      }
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(0, 0, 0, 0.05)'
+        }
+      },
+      y: {
+        grid: {
+          display: false
+        }
+      }
+    }
+  }
+});
+</script>
+{% endblock %}

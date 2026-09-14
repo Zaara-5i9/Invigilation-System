@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify OTP{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Verify OTP</h1>
+<p>An OTP has been sent to your registered email address. Enter it below to continue.</p>
+<form method="post" class="card card-body shadow-sm" style="max-width: 400px;">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label for="id_code" class="form-label">OTP Code</label>
+    <input type="text" name="code" id="id_code" class="form-control" maxlength="6" required>
+  </div>
+  <button type="submit" class="btn btn-primary">Verify</button>
+</form>
+{% endblock %}

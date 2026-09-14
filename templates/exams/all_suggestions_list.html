@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}All Allocation Suggestions{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-lightbulb"></i> Allocation Suggestions</h2>
+    <div>
+      {% if total_pending > 0 %}
+        <span class="badge bg-warning text-dark fs-5">{{ total_pending }} Pending</span>
+      {% endif %}
+      <a href="{% url 'exams:admin_dashboard' %}" class="btn btn-outline-secondary ms-2">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Status Filter -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="btn-group" role="group">
+        <a href="?status=ALL" class="btn {% if status_filter == 'ALL' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+          All
+        </a>
+        <a href="?status=PENDING" class="btn {% if status_filter == 'PENDING' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+          Pending
+        </a>
+        <a href="?status=REVIEWED" class="btn {% if status_filter == 'REVIEWED' %}btn-info{% else %}btn-outline-info{% endif %}">
+          Reviewed
+        </a>
+        <a href="?status=IMPLEMENTED" class="btn {% if status_filter == 'IMPLEMENTED' %}btn-success{% else %}btn-outline-success{% endif %}">
+          Implemented
+        </a>
+        <a href="?status=REJECTED" class="btn {% if status_filter == 'REJECTED' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+          Rejected
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suggestions List -->
+  <div class="row">
+    {% for suggestion in suggestions %}
+      <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card h-100 {% if suggestion.status == 'PENDING' %}border-warning{% endif %}">
+          <div class="card-header 
+            {% if suggestion.status == 'PENDING' %}bg-warning text-dark{% endif %}
+            {% if suggestion.status == 'REVIEWED' %}bg-info text-white{% endif %}
+            {% if suggestion.status == 'IMPLEMENTED' %}bg-success text-white{% endif %}
+            {% if suggestion.status == 'REJECTED' %}bg-secondary text-white{% endif %}">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="badge bg-dark">{{ suggestion.clash_type }}</span>
+              <small>{{ suggestion.created_at|date:"M d, Y" }}</small>
+            </div>
+          </div>
+          <div class="card-body">
+            <h6 class="card-title">
+              <i class="fas fa-user"></i> {{ suggestion.faculty.user.get_full_name }}
+            </h6>
+            <p class="card-text">
+              <strong>Exam:</strong> {{ suggestion.exam.course_code }}<br>
+              <strong>Date:</strong> {{ suggestion.exam.exam_date|date:"M d, Y" }}<br>
+              <strong>Hall:</strong> {{ suggestion.exam_session_hall.hall.name }}<br>
+              <strong>Dept:</strong> {{ suggestion.faculty.department.code }}
+            </p>
+            <div class="alert alert-light mb-2">
+              <small><strong>Suggestion:</strong> {{ suggestion.suggestion_text|truncatewords:15 }}</small>
+            </div>
+            {% if suggestion.admin_notes %}
+              <div class="alert alert-info mb-2">
+                <small><strong>Notes:</strong> {{ suggestion.admin_notes|truncatewords:10 }}</small>
+              </div>
+            {% endif %}
+          </div>
+          <div class="card-footer">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="badge 
+                {% if suggestion.status == 'PENDING' %}bg-warning text-dark{% endif %}
+                {% if suggestion.status == 'REVIEWED' %}bg-info{% endif %}
+                {% if suggestion.status == 'IMPLEMENTED' %}bg-success{% endif %}
+                {% if suggestion.status == 'REJECTED' %}bg-secondary{% endif %}">
+                {{ suggestion.get_status_display }}
+              </span>
+              <a href="{% url 'exams:suggestion_detail' suggestion.pk %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-eye"></i> View Details
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info text-center">
+          <i class="fas fa-inbox fa-3x mb-3"></i>
+          <p class="mb-0">No suggestions found for the selected filter</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if suggestions %}
+    <div class="alert alert-info mt-4">
+      <h6><i class="fas fa-info-circle"></i> About Suggestions</h6>
+      <ul class="mb-0">
+        <li><strong>Pending:</strong> Requires admin review and action</li>
+        <li><strong>Reviewed:</strong> Admin has reviewed but not yet implemented</li>
+        <li><strong>Implemented:</strong> Suggestion has been applied and assignment created</li>
+        <li><strong>Rejected:</strong> Suggestion was not suitable for implementation</li>
+      </ul>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

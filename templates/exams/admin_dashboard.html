@@ -1,0 +1,497 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<header class="bg-gradient-primary text-white py-4 mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h1 class="fw-bold mb-2">
+          <i class="fas fa-tachometer-alt me-3"></i>
+          Admin Dashboard
+        </h1>
+        <p class="mb-0 opacity-75">Welcome back! Manage your invigilation system efficiently.</p>
+      </div>
+      <div class="col-md-4 text-end">
+        <div class="d-flex flex-column align-items-end">
+          <div class="badge bg-light text-dark fs-6 px-3 py-2 mb-2">
+            <i class="fas fa-calendar me-2"></i>
+            {{ today|date:"l, d F Y" }}
+          </div>
+          <div class="d-flex gap-2">
+            <span class="badge bg-success">{{ total_faculty_count }} Faculty</span>
+            <span class="badge bg-warning">{{ pending_assignments_count }} Pending</span>
+            <span class="badge bg-info">{{ today_exams_count }} Today</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+  <!-- Quick Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="card-body text-white text-center p-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <h3 class="fw-bold mb-0">{{ upcoming_exams_count }}</h3>
+              <p class="mb-0 small">Upcoming Exams</p>
+            </div>
+            <i class="fas fa-calendar-check fa-2x opacity-75"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 h-100" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+        <div class="card-body text-white text-center p-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <h3 class="fw-bold mb-0">{{ today_exams_count }}</h3>
+              <p class="mb-0 small">Exams Today</p>
+            </div>
+            <i class="fas fa-clock fa-2x opacity-75"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 h-100" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+        <div class="card-body text-white text-center p-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <h3 class="fw-bold mb-0">{{ pending_assignments_count }}</h3>
+              <p class="mb-0 small">Pending Confirmations</p>
+            </div>
+            <i class="fas fa-hourglass-half fa-2x opacity-75"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 h-100" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+        <div class="card-body text-white text-center p-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <h3 class="fw-bold mb-0">
+                <a href="{% url 'accounts:faculty_list' %}" class="text-white text-decoration-none">
+                  {{ total_faculty_count }}
+                </a>
+              </h3>
+              <p class="mb-0 small">Total Faculty</p>
+            </div>
+            <i class="fas fa-users fa-2x opacity-75"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categorized Management Sections -->
+  <div class="row g-4 mb-5">
+    <!-- Faculty Management Section -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="fw-bold mb-0">
+            <i class="fas fa-users me-2"></i>
+            Faculty Management
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-6">
+              <a href="{% url 'accounts:create_faculty_batch' %}" class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-user-plus fa-2x mb-2"></i>
+                <span class="fw-bold">Add Faculty</span>
+                <small class="text-muted">Batch creation</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'accounts:faculty_list' %}" class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-users fa-2x mb-2"></i>
+                <span class="fw-bold">Faculty List</span>
+                <small class="text-muted">Manage faculty</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'accounts:faculty_action_logs' %}" class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-history fa-2x mb-2"></i>
+                <span class="fw-bold">Action Logs</span>
+                <small class="text-muted">Activities</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'leaves:leave_requests_admin' %}" class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-umbrella-beach fa-2x mb-2"></i>
+                <span class="fw-bold">Leave Requests</span>
+                <small class="text-muted">Approve/reject</small>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exam Management Section -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-success text-white">
+          <h5 class="fw-bold mb-0">
+            <i class="fas fa-clipboard-list me-2"></i>
+            Exam Management
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-6">
+              <a href="{% url 'exams:create_exam' %}" class="btn btn-outline-success w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-plus fa-2x mb-2"></i>
+                <span class="fw-bold">Create Exam</span>
+                <small class="text-muted">Single exam</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'exams:create_exam_batch' %}" class="btn btn-outline-success w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                <span class="fw-bold">Batch Create</span>
+                <small class="text-muted">Multiple exams</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'exams:exam_list' %}" class="btn btn-outline-success w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-list fa-2x mb-2"></i>
+                <span class="fw-bold">Manage Exams</span>
+                <small class="text-muted">View all exams</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'exams:upload_exam_timetable' %}" class="btn btn-outline-success w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-upload fa-2x mb-2"></i>
+                <span class="fw-bold">Upload Timetable</span>
+                <small class="text-muted">CSV upload</small>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hall & Venue Management Section -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-info text-white">
+          <h5 class="fw-bold mb-0">
+            <i class="fas fa-building me-2"></i>
+            Hall & Venue Management
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-6">
+              <a href="{% url 'exams:manage_halls' %}" class="btn btn-outline-info w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-door-open fa-2x mb-2"></i>
+                <span class="fw-bold">Manage Halls</span>
+                <small class="text-muted">Exam venues</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'exams:blocks_list' %}" class="btn btn-outline-info w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-building fa-2x mb-2"></i>
+                <span class="fw-bold">Block Overview</span>
+                <small class="text-muted">Building blocks</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'exams:manage_departments' %}" class="btn btn-outline-info w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-university fa-2x mb-2"></i>
+                <span class="fw-bold">Departments</span>
+                <small class="text-muted">Manage depts</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'exams:exam_list' %}" class="btn btn-outline-info w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-cogs fa-2x mb-2"></i>
+                <span class="fw-bold">Configure Halls</span>
+                <small class="text-muted">Select exam first</small>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assignment & Allocation Section -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-warning text-white">
+          <h5 class="fw-bold mb-0">
+            <i class="fas fa-tasks me-2"></i>
+            Assignment & Allocation
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-6">
+              <a href="{% url 'exams:pending_assignments' %}" class="btn btn-outline-warning w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-clipboard-check fa-2x mb-2"></i>
+                <span class="fw-bold">Pending Duties</span>
+                <small class="text-muted">Review assignments</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'exams:all_suggestions_list' %}" class="btn btn-outline-warning w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-lightbulb fa-2x mb-2"></i>
+                <span class="fw-bold">Suggestions</span>
+                <small class="text-muted">Manual interventions</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'exams:allocation_overview' %}" class="btn btn-outline-warning w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-chart-bar fa-2x mb-2"></i>
+                <span class="fw-bold">Allocation Overview</span>
+                <small class="text-muted">Assignment status</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'exams:exam_list' %}" class="btn btn-outline-warning w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-tasks fa-2x mb-2"></i>
+                <span class="fw-bold">Bulk Operations</span>
+                <small class="text-muted">Via exam list</small>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timetable & Course Management Section -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="fw-bold mb-0">
+            <i class="fas fa-calendar-alt me-2"></i>
+            Timetable & Courses
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-6">
+              <a href="{% url 'timetable:upload_timetable' %}" class="btn btn-outline-secondary w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-upload fa-2x mb-2"></i>
+                <span class="fw-bold">Upload Timetable</span>
+                <small class="text-muted">Faculty schedules</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'timetable:add_courses_batch' %}" class="btn btn-outline-secondary w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-plus-square fa-2x mb-2"></i>
+                <span class="fw-bold">Add Courses</span>
+                <small class="text-muted">Batch creation</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'timetable:view_courses' %}" class="btn btn-outline-secondary w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-eye fa-2x mb-2"></i>
+                <span class="fw-bold">View Courses</span>
+                <small class="text-muted">Browse catalog</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'timetable:manage_courses' %}" class="btn btn-outline-secondary w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-cogs fa-2x mb-2"></i>
+                <span class="fw-bold">Manage Courses</span>
+                <small class="text-muted">Edit/delete</small>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports & Analytics Section -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-dark text-white">
+          <h5 class="fw-bold mb-0">
+            <i class="fas fa-chart-line me-2"></i>
+            Reports & Analytics
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-6">
+              <a href="{% url 'exams:reports_dashboard' %}" class="btn btn-outline-dark w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-chart-line fa-2x mb-2"></i>
+                <span class="fw-bold">Analytics</span>
+                <small class="text-muted">Dashboard reports</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'exams:faculty_workload_report' %}" class="btn btn-outline-dark w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-users fa-2x mb-2"></i>
+                <span class="fw-bold">Workload Report</span>
+                <small class="text-muted">Faculty workload</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'exams:department_statistics' %}" class="btn btn-outline-dark w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-chart-pie fa-2x mb-2"></i>
+                <span class="fw-bold">Department Stats</span>
+                <small class="text-muted">Analytics</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'timetable:admin_view_faculty_timetables' %}" class="btn btn-outline-dark w-100 d-flex flex-column align-items-center py-3">
+                <i class="fas fa-calendar-alt fa-2x mb-2"></i>
+                <span class="fw-bold">Faculty Timetables</span>
+                <small class="text-muted">View schedules</small>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Exams -->
+  {% if upcoming_exams %}
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card border-0">
+        <div class="card-header bg-white border-0 pb-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0">
+              <i class="fas fa-calendar-alt me-2" style="color: #667eea;"></i>
+              Upcoming Exams
+            </h5>
+            <a href="{% url 'exams:exam_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>Date</th>
+                  <th>Course</th>
+                  <th>Department</th>
+                  <th>Time</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for exam in upcoming_exams|slice:":5" %}
+                  <tr>
+                    <td>
+                      <div class="fw-bold">{{ exam.exam_date|date:"d M Y" }}</div>
+                      <small class="text-muted">{{ exam.exam_date|date:"l" }}</small>
+                    </td>
+                    <td>
+                      <div class="fw-bold">{{ exam.course_code }}</div>
+                      <small class="text-muted">{{ exam.course_name|truncatewords:3 }}</small>
+                    </td>
+                    <td>
+                      <span class="badge" style="background: var(--primary-gradient);">
+                        {{ exam.department.code }}
+                      </span>
+                    </td>
+                    <td>
+                      <small>{{ exam.start_time|time:"h:i A" }} - {{ exam.end_time|time:"h:i A" }}</small>
+                    </td>
+                    <td>
+                      <div class="btn-group btn-group-sm">
+                        <a href="{% url 'exams:exam_detail' exam.pk %}" class="btn btn-outline-primary btn-sm">
+                          <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'exams:configure_exam_halls' exam.pk %}" class="btn btn-outline-success btn-sm">
+                          <i class="fas fa-user-check"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card border-0">
+        <div class="card-body text-center py-5">
+          <div class="mb-4">
+            <i class="fas fa-inbox fa-4x text-muted opacity-50"></i>
+          </div>
+          <h5 class="text-muted">No upcoming exams scheduled</h5>
+          <p class="text-muted mb-4">Create your first exam to get started</p>
+          <a href="{% url 'exams:create_exam' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Create Exam
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Footer Section -->
+<footer class="bg-dark text-white py-4 mt-5">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-6">
+        <h6 class="fw-bold mb-3">
+          <i class="fas fa-graduation-cap me-2"></i>
+          Invigilation Management System
+        </h6>
+        <p class="mb-2 small">Efficiently manage exam invigilation assignments and faculty schedules.</p>
+        <div class="d-flex gap-3">
+          <span class="badge bg-success">{{ total_faculty_count }} Faculty</span>
+          <span class="badge bg-info">{{ upcoming_exams_count }} Upcoming Exams</span>
+          <span class="badge bg-warning">{{ pending_assignments_count }} Pending</span>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <h6 class="fw-bold mb-3">Quick Links</h6>
+        <ul class="list-unstyled small">
+          <li><a href="{% url 'exams:create_exam' %}" class="text-light text-decoration-none">Create Exam</a></li>
+          <li><a href="{% url 'accounts:faculty_list' %}" class="text-light text-decoration-none">Faculty List</a></li>
+          <li><a href="{% url 'exams:pending_assignments' %}" class="text-light text-decoration-none">Pending Assignments</a></li>
+          <li><a href="{% url 'exams:reports_dashboard' %}" class="text-light text-decoration-none">Reports</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <h6 class="fw-bold mb-3">System Status</h6>
+        <div class="d-flex align-items-center mb-2">
+          <div class="bg-success rounded-circle me-2" style="width: 8px; height: 8px;"></div>
+          <small>All Systems Operational</small>
+        </div>
+        <div class="d-flex align-items-center mb-2">
+          <div class="bg-success rounded-circle me-2" style="width: 8px; height: 8px;"></div>
+          <small>Database Connected</small>
+        </div>
+        <div class="d-flex align-items-center">
+          <div class="bg-success rounded-circle me-2" style="width: 8px; height: 8px;"></div>
+          <small>Email Service Active</small>
+        </div>
+      </div>
+    </div>
+    <hr class="my-3 opacity-25">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <small class="text-muted">© 2024 Invigilation Management System. All rights reserved.</small>
+      </div>
+      <div class="col-md-6 text-end">
+        <small class="text-muted">Last updated: {{ today|date:"d M Y" }}</small>
+      </div>
+    </div>
+  </div>
+</footer>
+{% endblock %}

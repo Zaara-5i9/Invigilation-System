@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Blocks Overview{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Blocks</h1>
+<div class="row g-3">
+  {% for block in blocks %}
+    <div class="col-md-3">
+      <a href="{% url 'exams:block_detail' block %}" class="text-decoration-none">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center">
+            <h5 class="card-title mb-0">Block {{ block }}</h5>
+          </div>
+        </div>
+      </a>
+    </div>
+  {% empty %}
+    <p>No blocks defined yet. Add rooms in "Manage Blocks / Rooms" first.</p>
+  {% endfor %}
+</div>
+{% endblock %}

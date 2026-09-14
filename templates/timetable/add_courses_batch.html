@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Courses - Batch Mode{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-1" style="color: #667eea;">
+        <i class="fas fa-plus-square me-2"></i>
+        Add Courses - Batch Mode
+      </h2>
+      <p class="text-muted mb-0">Add multiple courses at once using the batch interface</p>
+    </div>
+    <div>
+      <a href="{% url 'exams:admin_dashboard' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-success text-white">
+      <h5 class="mb-0">
+        <i class="fas fa-book me-2"></i>Create Course Entries
+      </h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">Enter course details below. Use the "Add Course" button to append more rows. When done, click "Create Courses" to bulk-create course entries.</p>
+
+      <form id="batch-form" method="post" class="mb-4">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="create">
+
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle" id="course-table" style="table-layout: auto; min-width: 1000px;">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 200px;">Department</th>
+                <th style="width: 100px;">Year</th>
+                <th style="width: 100px;">Semester</th>
+                <th style="width: 200px;">Course Code</th>
+                <th style="width: 300px;">Course Name</th>
+                <th style="width: 50px;"></th>
+              </tr>
+            </thead>
+            <tbody id="course-tbody">
+              {% include 'timetable/partials/course_batch_row.html' with departments=departments row_index=0 only %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between gap-2">
+          <button type="button" id="add-row-btn" class="btn btn-outline-primary">
+            <i class="fas fa-plus"></i> Add Course
+          </button>
+          <div>
+            <a href="{% url 'exams:admin_dashboard' %}" class="btn btn-secondary">
+              <i class="fas fa-times"></i> Cancel
+            </a>
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-save"></i> Create Courses
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  let rowCount = 1;
+  const tbody = document.getElementById('course-tbody');
+  const addRowBtn = document.getElementById('add-row-btn');
+
+  // Attach delete handler using event delegation
+  tbody.addEventListener('click', function (e) {
+    if (e.target.classList.contains('delete-row')) {
+      const row = e.target.closest('tr');
+      if (tbody.children.length > 1) {
+        row.remove();
+      } else {
+        alert('At least one row must remain.');
+      }
+    }
+  });
+
+  addRowBtn.addEventListener('click', function () {
+    const formData = new FormData();
+    formData.append('action', 'add_row');
+    formData.append('row_index', rowCount);
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+    fetch("{% url 'timetable:add_courses_batch' %}", {
+      method: "POST",
+      body: formData,
+    })
+      .then((rsp) => {
+        if (!rsp.ok) throw new Error('Network response was not ok');
+        return rsp.text();
+      })
+      .then((html) => {
+        // Trim aggressively
+        const cleaned = html.replace(/^\s+/, '').replace(/\s+$/, '');
+        if (!cleaned) {
+          console.error('Server returned empty response');
+          alert('Server returned an empty response. Check console for details.');
+          return;
+        }
+        // Use a temporary template element to parse HTML
+        const template = document.createElement('template');
+        template.innerHTML = cleaned;
+        const newRow = template.content.firstElementChild;
+        if (!newRow || newRow.tagName !== 'TR') {
+          // Fallback: directly insert HTML if parsing fails (since response is a plain <tr>)
+          console.warn('Parsing failed, falling back to direct insertion:', cleaned);
+          tbody.insertAdjacentHTML('beforeend', cleaned);
+        } else {
+          tbody.appendChild(newRow);
+        }
+        rowCount += 1;
+      })
+      .catch((err) => {
+        console.error('Failed to add row:', err);
+        alert('Failed to add row. Check console for details.');
+      });
+  });
+});
+</script>
+{% endblock %}

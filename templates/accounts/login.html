@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-4">
+    <div class="card shadow">
+      <div class="card-header text-center">
+        <h3 class="mb-0">
+          <i class="fas fa-graduation-cap me-2"></i>
+          Platform Login
+        </h3>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
+          
+          <div class="mb-3">
+            <label for="id_username" class="form-label">
+              <i class="fas fa-user me-1"></i>Username
+            </label>
+            <input type="text" 
+                   class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                   id="id_username" 
+                   name="username" 
+                   placeholder="Enter your username"
+                   value="{{ form.username.value|default:'' }}">
+            {% if form.username.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.username.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+          
+          <div class="mb-3">
+            <label for="id_password" class="form-label">
+              <i class="fas fa-lock me-1"></i>Password
+            </label>
+            <input type="password" 
+                   class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                   id="id_password" 
+                   name="password" 
+                   placeholder="Enter your password">
+            {% if form.password.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.password.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+          
+          <button type="submit" class="btn btn-primary w-100 mb-3">
+            <i class="fas fa-sign-in-alt me-2"></i>Login
+          </button>
+          
+          <div class="text-center">
+            <a href="{% url 'accounts:forgot_password' %}" class="text-decoration-none">
+              <i class="fas fa-key me-1"></i>Forgot Password?
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

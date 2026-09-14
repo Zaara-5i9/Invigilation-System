@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Details - {{ faculty.user.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user"></i> Faculty Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <th>Name:</th>
+                            <td>{{ faculty.user.get_full_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Employee ID:</th>
+                            <td>{{ faculty.employee_id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>{{ faculty.user.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>Department:</th>
+                            <td>{{ faculty.department.name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Phone:</th>
+                            <td>{{ faculty.phone_number|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Cabin:</th>
+                            <td>{{ faculty.cabin_block }} {{ faculty.cabin_room }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td>
+                                {% if faculty.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Invigilation Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h3 class="text-primary">{{ stats.total }}</h3>
+                            <small class="text-muted">Total Assigned</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h3 class="text-success">{{ stats.confirmed }}</h3>
+                            <small class="text-muted">Confirmed</small>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="text-warning">{{ stats.pending }}</h3>
+                            <small class="text-muted">Pending</small>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="text-danger">{{ stats.declined }}</h3>
+                            <small class="text-muted">Declined</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Recent Activity Logs</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Action Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.created_at|date:"d M Y, h:i A" }}</td>
+                                    <td><span class="badge bg-info">{{ log.action_type }}</span></td>
+                                    <td>{{ log.description }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No activity logs found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{% url 'accounts:faculty_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Faculty List
+        </a>
+        <a href="{% url 'accounts:faculty_action_logs' %}?faculty={{ faculty.employee_id }}" class="btn btn-primary">
+            <i class="fas fa-history"></i> View All Logs
+        </a>
+    </div>
+</div>
+{% endblock %}

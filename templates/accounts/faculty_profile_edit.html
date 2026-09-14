@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-edit"></i> Edit Your Profile</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Employee ID</label>
+                                <input type="text" class="form-control" value="{{ faculty.employee_id }}" disabled>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Name</label>
+                                <input type="text" class="form-control" value="{{ faculty.user.get_full_name }}" disabled>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Email</label>
+                                <input type="email" class="form-control" value="{{ faculty.user.email }}" disabled>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Department</label>
+                                <input type="text" class="form-control" value="{{ faculty.department.name }}" disabled>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+                        <h5 class="mb-3">Editable Information</h5>
+
+                        <div class="mb-3">
+                            <label for="phone_number" class="form-label fw-bold">Phone Number</label>
+                            <input type="text" class="form-control" id="phone_number" name="phone_number" 
+                                   value="{{ faculty.phone_number }}" placeholder="Enter your phone number">
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="cabin_block" class="form-label fw-bold">Cabin Block</label>
+                                <input type="text" class="form-control" id="cabin_block" name="cabin_block" 
+                                       value="{{ faculty.cabin_block }}" placeholder="e.g., Block A">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cabin_room" class="form-label fw-bold">Cabin Room</label>
+                                <input type="text" class="form-control" id="cabin_room" name="cabin_room" 
+                                       value="{{ faculty.cabin_room }}" placeholder="e.g., Room 101">
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> All changes to your profile are logged and can be viewed by administrators.
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'accounts:dashboard' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

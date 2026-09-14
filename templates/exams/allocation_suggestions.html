@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block title %}Allocation Suggestions - {{ exam.course_code }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-lightbulb"></i> Manual Intervention Suggestions</h2>
+            <p class="text-muted mb-0">
+                Exam: <strong>{{ exam.course_code }} - {{ exam.course_name }}</strong> | 
+                {{ exam.exam_date|date:"d M Y" }} | {{ exam.start_time }} - {{ exam.end_time }}
+            </p>
+        </div>
+        <a href="{% url 'exams:exam_detail' exam.pk %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Exam
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message|safe }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body text-center">
+                    <h3>{{ pending_count }}</h3>
+                    <p class="mb-0">Pending Review</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body text-center">
+                    <h3>{{ reviewed|length }}</h3>
+                    <p class="mb-0">Reviewed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body text-center">
+                    <h3>{{ implemented|length }}</h3>
+                    <p class="mb-0">Implemented</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-secondary">
+                <div class="card-body text-center">
+                    <h3>{{ rejected|length }}</h3>
+                    <p class="mb-0">Rejected</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Suggestions -->
+    {% if pending %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Pending Suggestions ({{ pending_count }})</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Faculty</th>
+                            <th>Hall</th>
+                            <th>Clash Type</th>
+                            <th>Details</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for suggestion in pending %}
+                        <tr>
+                            <td>
+                                <strong>{{ suggestion.faculty.user.get_full_name }}</strong><br>
+                                <small class="text-muted">{{ suggestion.faculty.employee_id }} | {{ suggestion.faculty.department.code }}</small>
+                            </td>
+                            <td>{{ suggestion.exam_session_hall.hall.name }}<br><small class="text-muted">{{ suggestion.exam_session_hall.hall.block }}</small></td>
+                            <td><span class="badge bg-danger">{{ suggestion.clash_type }}</span></td>
+                            <td>
+                                {% load static %}
+                                {% with clash_data=suggestion.clash_details|safe %}
+                                    {{ clash_data|truncatewords:10 }}
+                                {% endwith %}
+                            </td>
+                            <td>{{ suggestion.created_at|date:"d M Y, h:i A" }}</td>
+                            <td>
+                                <a href="{% url 'exams:suggestion_detail' suggestion.pk %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-eye"></i> Review
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle"></i> No pending suggestions! All positions filled or reviewed.
+    </div>
+    {% endif %}
+
+    <!-- Other Suggestions (Reviewed/Implemented/Rejected) -->
+    {% if reviewed or implemented or rejected %}
+    <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="fas fa-history"></i> Processed Suggestions</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Faculty</th>
+                            <th>Hall</th>
+                            <th>Status</th>
+                            <th>Reviewed By</th>
+                            <th>Reviewed At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for suggestion in reviewed %}
+                        <tr>
+                            <td>{{ suggestion.faculty.user.get_full_name }}</td>
+                            <td>{{ suggestion.exam_session_hall.hall.name }}</td>
+                            <td><span class="badge bg-info">{{ suggestion.get_status_display }}</span></td>
+                            <td>{{ suggestion.reviewed_by.get_full_name|default:"-" }}</td>
+                            <td>{{ suggestion.reviewed_at|date:"d M Y, h:i A"|default:"-" }}</td>
+                            <td>
+                                <a href="{% url 'exams:suggestion_detail' suggestion.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% for suggestion in implemented %}
+                        <tr class="table-success">
+                            <td>{{ suggestion.faculty.user.get_full_name }}</td>
+                            <td>{{ suggestion.exam_session_hall.hall.name }}</td>
+                            <td><span class="badge bg-success">{{ suggestion.get_status_display }}</span></td>
+                            <td>{{ suggestion.reviewed_by.get_full_name|default:"-" }}</td>
+                            <td>{{ suggestion.reviewed_at|date:"d M Y, h:i A"|default:"-" }}</td>
+                            <td>
+                                <a href="{% url 'exams:suggestion_detail' suggestion.pk %}" class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% for suggestion in rejected %}
+                        <tr class="table-secondary">
+                            <td>{{ suggestion.faculty.user.get_full_name }}</td>
+                            <td>{{ suggestion.exam_session_hall.hall.name }}</td>
+                            <td><span class="badge bg-secondary">{{ suggestion.get_status_display }}</span></td>
+                            <td>{{ suggestion.reviewed_by.get_full_name|default:"-" }}</td>
+                            <td>{{ suggestion.reviewed_at|date:"d M Y, h:i A"|default:"-" }}</td>
+                            <td>
+                                <a href="{% url 'exams:suggestion_detail' suggestion.pk %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

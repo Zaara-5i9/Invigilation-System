@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Blocks / Rooms{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Manage Blocks / Rooms</h1>
+<form method="post" class="card card-body shadow-sm mb-4" style="max-width: 700px;">
+  {% csrf_token %}
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label class="form-label">Block</label>
+      <input type="text" name="block" class="form-control" placeholder="e.g. A, B, C" required>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Room / Hall Name</label>
+      <input type="text" name="name" class="form-control" placeholder="e.g. A101" required>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Floor</label>
+      <input type="text" name="floor" class="form-control" placeholder="G, 1, 2">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Capacity</label>
+      <input type="number" name="capacity" class="form-control" min="0" step="1" value="0">
+    </div>
+  </div>
+  <div class="mt-3">
+    <button type="submit" class="btn btn-primary">Add Room</button>
+  </div>
+</form>
+
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th>Block</th>
+      <th>Room</th>
+      <th>Floor</th>
+      <th>Capacity</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for hall in halls %}
+      <tr>
+        <td>{{ hall.block }}</td>
+        <td>{{ hall.name }}</td>
+        <td>{{ hall.floor }}</td>
+        <td>{{ hall.capacity }}</td>
+        <td>
+          <form method="post" style="display:inline;" onsubmit="return confirm('Delete this room?');">
+            {% csrf_token %}
+            <input type="hidden" name="delete_id" value="{{ hall.id }}">
+            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="text-center p-3">No rooms defined yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

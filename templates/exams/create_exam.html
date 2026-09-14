@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Exam{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-10 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0"><i class="fas fa-plus-circle"></i> Create Exam</h4>
+        </div>
+        <div class="card-body">
+          <form method="post" id="exam-form">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+            
+            <!-- Step 1: Select Department, Year, Semester -->
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i> <strong>Step 1:</strong> Select Department, Year, and Semester to load available courses
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="form-label fw-bold" for="id_department">Department <span class="text-danger">*</span></label>
+                {{ form.department }}
+                {% if form.department.errors %}
+                  <div class="text-danger small">{{ form.department.errors|striptags }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold" for="id_year">Year <span class="text-danger">*</span></label>
+                {{ form.year }}
+                {% if form.year.errors %}
+                  <div class="text-danger small">{{ form.year.errors|striptags }}</div>
+                {% endif %}
+                <small class="form-text text-muted">Year of study (1-4)</small>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold" for="id_semester">Semester <span class="text-danger">*</span></label>
+                {{ form.semester }}
+                {% if form.semester.errors %}
+                  <div class="text-danger small">{{ form.semester.errors|striptags }}</div>
+                {% endif %}
+                <small class="form-text text-muted">Semester (1-2)</small>
+              </div>
+            </div>
+
+            <hr>
+
+            <!-- Step 2: Select Course -->
+            <div class="alert alert-warning" id="course-alert">
+              <i class="fas fa-arrow-up"></i> Please select Department, Year, and Semester above to load courses
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="id_course_code">Course Code <span class="text-danger">*</span></label>
+                <select id="id_course_code" name="course_code" class="form-control" required disabled>
+                  <option value="">-- Select Department, Year, Semester First --</option>
+                </select>
+                {% if form.course_code.errors %}
+                  <div class="text-danger small">{{ form.course_code.errors|striptags }}</div>
+                {% endif %}
+                <small class="form-text text-muted" id="course-status">Waiting for selection...</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="id_course_name">Course Name <span class="text-danger">*</span></label>
+                {{ form.course_name }}
+                {% if form.course_name.errors %}
+                  <div class="text-danger small">{{ form.course_name.errors|striptags }}</div>
+                {% endif %}
+                <small class="form-text text-muted">Auto-filled when course is selected</small>
+              </div>
+            </div>
+
+            <hr>
+
+            <!-- Step 3: Exam Details -->
+            <div class="alert alert-success">
+              <i class="fas fa-calendar-check"></i> <strong>Step 3:</strong> Enter exam details
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="id_exam_type">Exam Type <span class="text-danger">*</span></label>
+                {{ form.exam_type }}
+                {% if form.exam_type.errors %}
+                  <div class="text-danger small">{{ form.exam_type.errors|striptags }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="id_exam_date">Exam Date <span class="text-danger">*</span></label>
+                {{ form.exam_date }}
+                {% if form.exam_date.errors %}
+                  <div class="text-danger small">{{ form.exam_date.errors|striptags }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="id_start_time">Start Time <span class="text-danger">*</span></label>
+                {{ form.start_time }}
+                {% if form.start_time.errors %}
+                  <div class="text-danger small">{{ form.start_time.errors|striptags }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="id_end_time">End Time <span class="text-danger">*</span></label>
+                {{ form.end_time }}
+                {% if form.end_time.errors %}
+                  <div class="text-danger small">{{ form.end_time.errors|striptags }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'exams:exam_list' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+              </a>
+              <button type="submit" class="btn btn-primary" id="submit-btn">
+                <i class="fas fa-save"></i> Create Exam
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== EXAM FORM INITIALIZED ===');
+    
+    const departmentField = document.getElementById('id_department');
+    const yearField = document.getElementById('id_year');
+    const semesterField = document.getElementById('id_semester');
+    const courseCodeField = document.getElementById('id_course_code');
+    const courseNameField = document.getElementById('id_course_name');
+    const courseAlert = document.getElementById('course-alert');
+    const courseStatus = document.getElementById('course-status');
+    
+    // Store course data
+    let courseData = {};
+    
+    // Function to load courses
+    function loadCourses() {
+        const dept = departmentField.value;
+        const year = yearField.value;
+        const sem = semesterField.value;
+        
+        console.log('Loading courses for:', { dept, year, sem });
+        
+        if (!dept || !year || !sem) {
+            courseCodeField.disabled = true;
+            courseCodeField.innerHTML = '<option value="">-- Select Department, Year, Semester First --</option>';
+            courseStatus.textContent = 'Waiting for selection...';
+            courseStatus.className = 'form-text text-muted';
+            courseAlert.style.display = 'block';
+            return;
+        }
+        
+        // Show loading
+        courseCodeField.disabled = true;
+        courseCodeField.innerHTML = '<option value="">Loading courses...</option>';
+        courseStatus.textContent = 'Loading...';
+        courseStatus.className = 'form-text text-info';
+        courseAlert.style.display = 'none';
+        
+        // Fetch courses
+        const url = `/exams/api/courses/?department=${dept}&year=${year}&semester=${sem}`;
+        console.log('Fetching from:', url);
+        
+        fetch(url)
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received data:', data);
+                
+                courseCodeField.innerHTML = '<option value="">-- Select Course --</option>';
+                courseData = {};
+                
+                if (data.courses && data.courses.length > 0) {
+                    data.courses.forEach(course => {
+                        const option = document.createElement('option');
+                        option.value = course.code;
+                        option.textContent = `${course.code} - ${course.name}`;
+                        courseCodeField.appendChild(option);
+                        courseData[course.code] = course.name;
+                    });
+                    
+                    courseCodeField.disabled = false;
+                    courseStatus.textContent = `${data.courses.length} course(s) available`;
+                    courseStatus.className = 'form-text text-success';
+                    console.log('Loaded', data.courses.length, 'courses');
+                } else {
+                    courseCodeField.innerHTML = '<option value="">No courses found for this selection</option>';
+                    courseStatus.textContent = 'No courses found. Please add courses in "Manage Courses" first.';
+                    courseStatus.className = 'form-text text-danger';
+                    console.log('No courses found');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading courses:', error);
+                courseCodeField.innerHTML = '<option value="">Error loading courses</option>';
+                courseStatus.textContent = 'Error: ' + error.message;
+                courseStatus.className = 'form-text text-danger';
+            });
+    }
+    
+    // Function to update course name
+    function updateCourseName() {
+        const code = courseCodeField.value;
+        if (code && courseData[code]) {
+            courseNameField.value = courseData[code];
+            console.log('Course name set to:', courseData[code]);
+        } else {
+            courseNameField.value = '';
+        }
+    }
+    
+    // Add event listeners
+    departmentField.addEventListener('change', loadCourses);
+    yearField.addEventListener('change', loadCourses);
+    semesterField.addEventListener('change', loadCourses);
+    courseCodeField.addEventListener('change', updateCourseName);
+    
+    // Initial load if values are already set
+    if (departmentField.value && yearField.value && semesterField.value) {
+        console.log('Initial values detected, loading courses...');
+        loadCourses();
+    }
+    
+    console.log('=== INITIALIZATION COMPLETE ===');
+});
+</script>
+{% endblock %}

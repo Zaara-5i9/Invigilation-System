@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Multiple Exams{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0"><i class="fas fa-calendar-plus"></i> Create Multiple Exams</h4>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Add multiple exams at once. Click "Add Exam" to add more rows. All exams will be created when you submit.
+      </div>
+
+      <form method="post" id="batch-exam-form">
+        {% csrf_token %}
+        
+        <div class="table-responsive">
+          <table class="table table-bordered" id="exam-table">
+            <thead class="table-light">
+              <tr>
+                <th>Department</th>
+                <th>Year</th>
+                <th>Sem</th>
+                <th>Course Code</th>
+                <th>Course Name</th>
+                <th>Exam Type</th>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="exam-tbody">
+              <!-- Initial row will be added by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <button type="button" id="add-exam-btn" class="btn btn-outline-primary">
+            <i class="fas fa-plus"></i> Add Exam
+          </button>
+          <div>
+            <a href="{% url 'exams:exam_list' %}" class="btn btn-secondary">
+              <i class="fas fa-times"></i> Cancel
+            </a>
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-save"></i> Create All Exams
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let rowCount = 0;
+    const tbody = document.getElementById('exam-tbody');
+    const addExamBtn = document.getElementById('add-exam-btn');
+    
+    // Department and course data
+    const departments = {{ departments_json|safe }};
+    const examTypes = [
+        {value: 'MID', label: 'Mid-term'},
+        {value: 'END', label: 'End-semester'},
+        {value: 'TEST', label: 'Test'}
+    ];
+    
+    function createExamRow(index) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <select name="exams[${index}][department]" class="form-control form-control-sm dept-select" data-index="${index}" required>
+                    <option value="">Select</option>
+                    ${departments.map(d => `<option value="${d.id}">${d.code}</option>`).join('')}
+                </select>
+            </td>
+            <td>
+                <select name="exams[${index}][year]" class="form-control form-control-sm year-select" data-index="${index}" required>
+                    <option value="">-</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </td>
+            <td>
+                <select name="exams[${index}][semester]" class="form-control form-control-sm sem-select" data-index="${index}" required>
+                    <option value="">-</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </td>
+            <td>
+                <select name="exams[${index}][course_code]" class="form-control form-control-sm course-select" data-index="${index}" required disabled>
+                    <option value="">Select dept/year/sem first</option>
+                </select>
+            </td>
+            <td>
+                <input type="text" name="exams[${index}][course_name]" class="form-control form-control-sm course-name" readonly required>
+            </td>
+            <td>
+                <select name="exams[${index}][exam_type]" class="form-control form-control-sm" required>
+                    ${examTypes.map(t => `<option value="${t.value}">${t.label}</option>`).join('')}
+                </select>
+            </td>
+            <td>
+                <input type="date" name="exams[${index}][exam_date]" class="form-control form-control-sm" required>
+            </td>
+            <td>
+                <input type="time" name="exams[${index}][start_time]" class="form-control form-control-sm" required>
+            </td>
+            <td>
+                <input type="time" name="exams[${index}][end_time]" class="form-control form-control-sm" required>
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger delete-row" data-index="${index}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        return row;
+    }
+    
+    function loadCourses(index) {
+        const deptSelect = document.querySelector(`.dept-select[data-index="${index}"]`);
+        const yearSelect = document.querySelector(`.year-select[data-index="${index}"]`);
+        const semSelect = document.querySelector(`.sem-select[data-index="${index}"]`);
+        const courseSelect = document.querySelector(`.course-select[data-index="${index}"]`);
+        const courseNameInput = document.querySelector(`input[name="exams[${index}][course_name]"]`);
+        
+        const dept = deptSelect.value;
+        const year = yearSelect.value;
+        const sem = semSelect.value;
+        
+        if (!dept || !year || !sem) {
+            courseSelect.disabled = true;
+            courseSelect.innerHTML = '<option value="">Select dept/year/sem first</option>';
+            courseNameInput.value = '';
+            return;
+        }
+        
+        courseSelect.disabled = true;
+        courseSelect.innerHTML = '<option value="">Loading...</option>';
+        
+        fetch(`/exams/api/courses/?department=${dept}&year=${year}&semester=${sem}`)
+            .then(response => response.json())
+            .then(data => {
+                courseSelect.innerHTML = '<option value="">Select Course</option>';
+                if (data.courses && data.courses.length > 0) {
+                    data.courses.forEach(course => {
+                        const option = document.createElement('option');
+                        option.value = course.code;
+                        option.textContent = `${course.code} - ${course.name}`;
+                        option.dataset.name = course.name;
+                        courseSelect.appendChild(option);
+                    });
+                    courseSelect.disabled = false;
+                } else {
+                    courseSelect.innerHTML = '<option value="">No courses found</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading courses:', error);
+                courseSelect.innerHTML = '<option value="">Error loading courses</option>';
+            });
+    }
+    
+    // Event delegation for dynamic elements
+    tbody.addEventListener('change', function(e) {
+        if (e.target.classList.contains('dept-select') || 
+            e.target.classList.contains('year-select') || 
+            e.target.classList.contains('sem-select')) {
+            const index = e.target.dataset.index;
+            loadCourses(index);
+        }
+        
+        if (e.target.classList.contains('course-select')) {
+            const index = e.target.dataset.index;
+            const courseNameInput = document.querySelector(`input[name="exams[${index}][course_name]"]`);
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            courseNameInput.value = selectedOption.dataset.name || '';
+        }
+    });
+    
+    tbody.addEventListener('click', function(e) {
+        if (e.target.closest('.delete-row')) {
+            const row = e.target.closest('tr');
+            if (tbody.children.length > 1) {
+                row.remove();
+            } else {
+                alert('At least one exam must remain.');
+            }
+        }
+    });
+    
+    addExamBtn.addEventListener('click', function() {
+        const row = createExamRow(rowCount);
+        tbody.appendChild(row);
+        rowCount++;
+    });
+    
+    // Add initial row
+    addExamBtn.click();
+});
+</script>
+{% endblock %}

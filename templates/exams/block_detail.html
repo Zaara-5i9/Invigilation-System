@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load timetable_extras %}
+
+{% block title %}Block {{ block_code }} Rooms{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Block {{ block_code }} - Rooms &amp; Cabins</h1>
+<a href="{% url 'exams:blocks_list' %}" class="btn btn-sm btn-outline-secondary mb-3">Back to Blocks</a>
+
+<div class="row g-3">
+  {% for hall in halls %}
+    {% with faculty_list=faculty_by_room|dict_get:hall.name %}
+      {% if faculty_list %}
+        {% with tooltip=faculty_list|join:', ' %}
+          {% include 'exams/partials/_room_card.html' with hall=hall tooltip=tooltip %}
+        {% endwith %}
+      {% else %}
+        {% include 'exams/partials/_room_card.html' with hall=hall tooltip='' %}
+      {% endif %}
+    {% endwith %}
+  {% empty %}
+    <p>No rooms defined for this block.</p>
+  {% endfor %}
+</div>
+{% endblock %}

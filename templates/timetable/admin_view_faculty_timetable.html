@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}{{ faculty.user.get_full_name|default:faculty.user.username }} - Timetable{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: #667eea;">
+                <i class="fas fa-calendar-alt me-2"></i>
+                Faculty Timetable - {{ faculty.user.get_full_name|default:faculty.user.username }}
+            </h2>
+            <p class="text-muted mb-0">
+                <span class="badge bg-primary me-2">{{ faculty.employee_id }}</span>
+                {{ faculty.department.code }} - {{ faculty.department.name }}
+            </p>
+        </div>
+        <div>
+            <a href="{% url 'timetable:admin_add_faculty_timetable' %}?faculty_id={{ faculty.id }}" class="btn btn-success">
+                <i class="fas fa-edit me-2"></i>Edit Timetable
+            </a>
+            <a href="{% url 'timetable:admin_view_faculty_timetables' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to List
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Timetable Grid -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-week me-2"></i>Weekly Schedule
+                </h5>
+                <div class="badge bg-light text-dark">
+                    Read-Only View
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 120px;">Time</th>
+                            {% for day_code, day_name in days %}
+                                <th class="text-center">{{ day_name }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for slot_key, slot_label in time_slots %}
+                            <tr>
+                                <td class="fw-bold text-center align-middle">
+                                    {{ slot_label }}
+                                </td>
+                                {% for day_code, day_name in days %}
+                                    <td class="text-center align-middle" style="height: 80px;">
+                                        {% for slot in grid|lookup:day_code|lookup:slot_key %}
+                                            <div class="slot-content p-2 mb-1 rounded" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                                <div class="fw-bold small">{{ slot.course_code }}</div>
+                                                <div class="small">{{ slot.course_name|truncatechars:25 }}</div>
+                                                {% if slot.department %}
+                                                    <div class="small opacity-75">
+                                                        {{ slot.department.code }} Y{{ slot.year }}/S{{ slot.semester }}
+                                                        {% if slot.is_lab %}<span class="badge badge-sm bg-success ms-1">Lab</span>{% endif %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% empty %}
+                                            <div class="text-muted small">Free</div>
+                                        {% endfor %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Schedule Statistics
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% with total_slots=total_slots_count %}
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="fw-bold h4 text-primary">{{ total_slots }}</div>
+                                <small class="text-muted">Teaching Hours</small>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fw-bold h4 text-success">Available</div>
+                                <small class="text-muted">For Invigilation</small>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fw-bold h4 text-info">{{ lab_sessions_count }}</div>
+                                <small class="text-muted">Lab Sessions</small>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fw-bold h4 text-warning">{{ approved_leaves.count }}</div>
+                                <small class="text-muted">Approved Leaves</small>
+                            </div>
+                        </div>
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            {% if approved_leaves %}
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-warning text-dark">
+                        <h6 class="mb-0">
+                            <i class="fas fa-calendar-times me-2"></i>Upcoming Leaves
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% for leave in approved_leaves|slice:":3" %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <div class="fw-bold small">{{ leave.leave_type }}</div>
+                                    <div class="text-muted small">{{ leave.reason|truncatechars:30 }}</div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="small">{{ leave.start_date|date:"M d" }} - {{ leave.end_date|date:"M d" }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% if approved_leaves.count > 3 %}
+                            <div class="text-center mt-2">
+                                <small class="text-muted">+{{ approved_leaves.count|add:"-3" }} more leaves</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-4">
+                        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                        <h6 class="text-success">No Upcoming Leaves</h6>
+                        <small class="text-muted">Faculty is available for invigilation duties</small>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.slot-content {
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.badge-sm {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+}
+</style>
+{% endblock %}

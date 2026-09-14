@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}Suggestion Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"><i class="fas fa-lightbulb"></i> Manual Intervention Suggestion</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Exam Details -->
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-graduation-cap"></i> Exam Information</h5>
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <th width="30%">Course:</th>
+                                <td>{{ suggestion.exam.course_code }} - {{ suggestion.exam.course_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Department:</th>
+                                <td>{{ suggestion.exam.department.name }} ({{ suggestion.exam.department.code }})</td>
+                            </tr>
+                            <tr>
+                                <th>Year/Semester:</th>
+                                <td>Year {{ suggestion.exam.year }}, Semester {{ suggestion.exam.semester }}</td>
+                            </tr>
+                            <tr>
+                                <th>Date & Time:</th>
+                                <td>{{ suggestion.exam.exam_date|date:"l, d F Y" }} | {{ suggestion.exam.start_time }} - {{ suggestion.exam.end_time }}</td>
+                            </tr>
+                            <tr>
+                                <th>Hall:</th>
+                                <td>{{ suggestion.exam_session_hall.hall.name }}, {{ suggestion.exam_session_hall.hall.block }}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Faculty Details -->
+                    <div class="alert alert-primary">
+                        <h5><i class="fas fa-user"></i> Faculty Information</h5>
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <th width="30%">Name:</th>
+                                <td>{{ suggestion.faculty.user.get_full_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Employee ID:</th>
+                                <td>{{ suggestion.faculty.employee_id }}</td>
+                            </tr>
+                            <tr>
+                                <th>Department:</th>
+                                <td>{{ suggestion.faculty.department.name }} ({{ suggestion.faculty.department.code }})</td>
+                            </tr>
+                            <tr>
+                                <th>Email:</th>
+                                <td>{{ suggestion.faculty.user.email }}</td>
+                            </tr>
+                            <tr>
+                                <th>Cabin:</th>
+                                <td>{{ suggestion.faculty.cabin_block }} {{ suggestion.faculty.cabin_room }}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Clash Details -->
+                    <div class="alert alert-danger">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Conflict Details</h5>
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <th width="30%">Clash Type:</th>
+                                <td><span class="badge bg-danger">{{ suggestion.clash_type }}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Details:</th>
+                                <td>
+                                    {% if clash_data.details %}
+                                        {{ clash_data.details }}
+                                    {% endif %}
+                                    {% if clash_data.clash_info %}
+                                        <br><br>
+                                        <strong>Conflicting Class:</strong><br>
+                                        - Time: {{ clash_data.clash_info.time }}<br>
+                                        - Course: {{ clash_data.clash_info.course }}<br>
+                                        - Teaching Year {{ clash_data.clash_info.year }} students<br>
+                                        {% if clash_data.clash_info.is_lab %}
+                                        - Type: Lab Session
+                                        {% else %}
+                                        - Type: Lecture
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Suggestions -->
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-magic"></i> Recommended Actions</h5>
+                        <div style="white-space: pre-line;">{{ suggestion.suggestion_text }}</div>
+                    </div>
+
+                    <!-- Status & Review Info -->
+                    {% if suggestion.status != 'PENDING' %}
+                    <div class="alert alert-secondary">
+                        <h5><i class="fas fa-info-circle"></i> Review Information</h5>
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <th width="30%">Status:</th>
+                                <td><span class="badge bg-secondary">{{ suggestion.get_status_display }}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Reviewed By:</th>
+                                <td>{{ suggestion.reviewed_by.get_full_name|default:"-" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Reviewed At:</th>
+                                <td>{{ suggestion.reviewed_at|date:"d M Y, h:i A"|default:"-" }}</td>
+                            </tr>
+                            {% if suggestion.admin_notes %}
+                            <tr>
+                                <th>Admin Notes:</th>
+                                <td>{{ suggestion.admin_notes }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    {% if suggestion.status == 'PENDING' %}
+                    <hr>
+                    <h5 class="mb-3">Take Action</h5>
+                    
+                    <form method="post" class="mb-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="implement">
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Admin Notes (Optional)</label>
+                            <textarea name="notes" id="notes" class="form-control" rows="3" placeholder="Add any notes about the implementation..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to implement this suggestion and assign this faculty?')">
+                            <i class="fas fa-check-circle"></i> Implement & Assign Faculty
+                        </button>
+                    </form>
+
+                    <form method="post" class="mb-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="mark_reviewed">
+                        <div class="mb-3">
+                            <label for="notes2" class="form-label">Admin Notes (Optional)</label>
+                            <textarea name="notes" id="notes2" class="form-control" rows="2" placeholder="Add any notes..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-eye"></i> Mark as Reviewed (No Action Yet)
+                        </button>
+                    </form>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="reject">
+                        <div class="mb-3">
+                            <label for="notes3" class="form-label">Reason for Rejection</label>
+                            <textarea name="notes" id="notes3" class="form-control" rows="2" placeholder="Why is this suggestion being rejected?" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to reject this suggestion?')">
+                            <i class="fas fa-times-circle"></i> Reject Suggestion
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'exams:allocation_suggestions' suggestion.exam.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Suggestions
+                        </a>
+                        <a href="{% url 'exams:exam_detail' suggestion.exam.pk %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-graduation-cap"></i> View Exam Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

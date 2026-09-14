@@ -1,0 +1,497 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Invigilation System{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        --info-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        --light-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      body {
+        font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+      }
+
+      .navbar {
+        background: var(--primary-gradient) !important;
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .nav-link {
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        margin: 0 2px;
+      }
+
+      .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+        overflow: hidden;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-shadow-hover);
+      }
+
+      .card-header {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        font-weight: 600;
+        padding: 1.25rem 1.5rem;
+      }
+
+      .btn {
+        border-radius: 10px;
+        font-weight: 500;
+        padding: 0.5rem 1.5rem;
+        transition: all 0.3s ease;
+        border: none;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      .btn-primary {
+        background: var(--primary-gradient);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+      }
+
+      .btn-success {
+        background: var(--success-gradient);
+        box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+      }
+
+      .btn-warning {
+        background: var(--warning-gradient);
+        box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4);
+      }
+
+      .btn-danger {
+        background: var(--danger-gradient);
+        box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);
+      }
+
+      .btn-info {
+        background: var(--info-gradient);
+        box-shadow: 0 4px 15px rgba(168, 237, 234, 0.4);
+      }
+
+      .btn-secondary {
+        background: var(--dark-gradient);
+        box-shadow: 0 4px 15px rgba(44, 62, 80, 0.4);
+      }
+
+      .alert {
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(10px);
+      }
+
+      .alert-success {
+        background: linear-gradient(135deg, rgba(67, 233, 123, 0.1), rgba(56, 249, 215, 0.1));
+        border-left: 4px solid #43e97b;
+        color: #155724;
+      }
+
+      .alert-danger {
+        background: linear-gradient(135deg, rgba(250, 112, 154, 0.1), rgba(254, 225, 64, 0.1));
+        border-left: 4px solid #fa709a;
+        color: #721c24;
+      }
+
+      .alert-warning {
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 235, 59, 0.1));
+        border-left: 4px solid #ffc107;
+        color: #856404;
+      }
+
+      .alert-info {
+        background: linear-gradient(135deg, rgba(168, 237, 234, 0.1), rgba(254, 214, 227, 0.1));
+        border-left: 4px solid #a8edea;
+        color: #0c5460;
+      }
+
+      .table {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+      }
+
+      .table thead th {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        font-weight: 600;
+        padding: 1rem;
+      }
+
+      .table tbody tr {
+        transition: all 0.2s ease;
+      }
+
+      .table-hover tbody tr:hover {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+        transform: scale(1.01);
+      }
+
+      .badge {
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+      }
+
+      .badge.bg-primary {
+        background: var(--primary-gradient) !important;
+      }
+
+      .badge.bg-success {
+        background: var(--success-gradient) !important;
+      }
+
+      .badge.bg-warning {
+        background: var(--warning-gradient) !important;
+      }
+
+      .badge.bg-danger {
+        background: var(--danger-gradient) !important;
+      }
+
+      .dropdown-menu {
+        border: none;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+      }
+
+      .dropdown-item {
+        border-radius: 8px;
+        margin: 2px 8px;
+        transition: all 0.2s ease;
+      }
+
+      .dropdown-item:hover {
+        background: var(--primary-gradient);
+        color: white;
+        transform: translateX(5px);
+      }
+
+      .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid rgba(102, 126, 234, 0.1);
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        background: white;
+      }
+
+      footer {
+        background: var(--dark-gradient) !important;
+        margin-top: 3rem;
+        padding: 2rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      /* Notification bell animation */
+      .notification-bell {
+        animation: ring 2s ease-in-out infinite;
+      }
+
+      @keyframes ring {
+        0% { transform: rotate(0deg); }
+        10% { transform: rotate(10deg); }
+        20% { transform: rotate(-10deg); }
+        30% { transform: rotate(10deg); }
+        40% { transform: rotate(-10deg); }
+        50% { transform: rotate(0deg); }
+        100% { transform: rotate(0deg); }
+      }
+
+      /* Loading animation */
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(102, 126, 234, 0.3);
+        border-radius: 50%;
+        border-top-color: #667eea;
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .card {
+          margin-bottom: 1rem;
+        }
+        
+        .btn {
+          padding: 0.4rem 1rem;
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="/">
+          <i class="fas fa-graduation-cap me-2"></i> Invigilation Management
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            {% if user.is_authenticated %}
+              {% if user.is_staff %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'exams:admin_dashboard' %}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'accounts:faculty_list' %}">
+                    <i class="fas fa-users"></i> Faculty
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'exams:exam_list' %}">
+                    <i class="fas fa-calendar-check"></i> Exams
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'accounts:faculty_action_logs' %}">
+                    <i class="fas fa-history"></i> Logs
+                  </a>
+                </li>
+              {% else %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'exams:faculty_dashboard' %}">
+                    <i class="fas fa-clipboard-list"></i> My Duties
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'timetable:faculty_timetable' %}">
+                    <i class="fas fa-calendar-alt"></i> My Timetable
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'leaves:my_leaves' %}">
+                    <i class="fas fa-umbrella-beach"></i> My Leaves
+                  </a>
+                </li>
+              {% endif %}
+            {% endif %}
+          </ul>
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            {% if user.is_authenticated %}
+              <!-- Notification Bell -->
+              <li class="nav-item dropdown me-3">
+                <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" 
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fas fa-bell fa-lg notification-bell"></i>
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                        id="notification-badge" style="display: none;">
+                    0
+                  </span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" style="width: 350px;">
+                  <li class="dropdown-header d-flex justify-content-between align-items-center">
+                    <span>Notifications</span>
+                    <a href="{% url 'notifications:notification_list' %}" class="btn btn-sm btn-link">View All</a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <div id="notification-list" style="max-height: 400px; overflow-y: auto;">
+                    <li class="dropdown-item text-center text-muted">
+                      <small>Loading...</small>
+                    </li>
+                  </div>
+                </ul>
+              </li>
+              
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fas fa-user-circle"></i> {{ user.get_full_name|default:user.username }}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                  {% if not user.is_staff %}
+                    <li><a class="dropdown-item" href="{% url 'accounts:faculty_profile_edit' %}">
+                      <i class="fas fa-user-edit"></i> Edit Profile
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                  {% endif %}
+                  <li><a class="dropdown-item" href="{% url 'notifications:notification_preferences' %}">
+                    <i class="fas fa-cog"></i> Notification Settings
+                  </a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                  </a></li>
+                </ul>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'accounts:login' %}">
+                  <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid mt-4">
+      <!-- Messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Page Content -->
+      {% block content %}{% endblock %}
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+      <div class="container">
+        <p class="mb-0">
+          <i class="fas fa-graduation-cap"></i> Invigilation Management System &copy; 2026
+        </p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Initialize Bootstrap tooltips
+      document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Load notifications if user is authenticated
+        {% if user.is_authenticated %}
+        loadNotifications();
+        // Refresh every 60 seconds
+        setInterval(loadNotifications, 60000);
+        {% endif %}
+      });
+      
+      {% if user.is_authenticated %}
+      function loadNotifications() {
+        // Get unread count
+        fetch('/notifications/api/unread-count/')
+          .then(response => response.json())
+          .then(data => {
+            const badge = document.getElementById('notification-badge');
+            if (data.count > 0) {
+              badge.textContent = data.count;
+              badge.style.display = 'inline';
+            } else {
+              badge.style.display = 'none';
+            }
+          })
+          .catch(error => console.log('Error loading notification count:', error));
+        
+        // Get recent notifications
+        fetch('/notifications/api/recent/')
+          .then(response => response.json())
+          .then(data => {
+            const notificationList = document.getElementById('notification-list');
+            if (data.notifications && data.notifications.length > 0) {
+              notificationList.innerHTML = data.notifications.map(notification => `
+                <li class="dropdown-item">
+                  <div class="d-flex">
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">${notification.title}</h6>
+                      <p class="mb-1 small text-muted">${notification.message}</p>
+                      <small class="text-muted">${notification.created_at}</small>
+                    </div>
+                    ${!notification.is_read ? '<span class="badge bg-primary">New</span>' : ''}
+                  </div>
+                </li>
+              `).join('');
+            } else {
+              notificationList.innerHTML = '<li class="dropdown-item text-center text-muted"><small>No notifications</small></li>';
+            }
+          })
+          .catch(error => {
+            console.log('Error loading notifications:', error);
+            document.getElementById('notification-list').innerHTML = '<li class="dropdown-item text-center text-muted"><small>Error loading notifications</small></li>';
+          });
+      }
+      {% endif %}
+    </script>
+  </body>
+</html>

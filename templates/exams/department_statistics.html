@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Department Statistics{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-building"></i> Department Statistics</h2>
+    <a href="{% url 'exams:reports_dashboard' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Date Range Filter -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">From Date</label>
+          <input type="date" name="date_from" class="form-control" value="{{ date_from|date:'Y-m-d' }}">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">To Date</label>
+          <input type="date" name="date_to" class="form-control" value="{{ date_to|date:'Y-m-d' }}">
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-filter"></i> Apply Filter
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Department Cards -->
+  <div class="row g-3">
+    {% for item in dept_data %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">{{ item.department.code }}</h5>
+            <small>{{ item.department.name }}</small>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-6 mb-3">
+                <div class="border-end">
+                  <h3 class="text-primary">{{ item.total_exams }}</h3>
+                  <small class="text-muted">Total Exams</small>
+                </div>
+              </div>
+              <div class="col-6 mb-3">
+                <h3 class="text-success">{{ item.faculty_count }}</h3>
+                <small class="text-muted">Active Faculty</small>
+              </div>
+              <div class="col-6">
+                <div class="border-end">
+                  <h3 class="text-info">{{ item.total_assignments }}</h3>
+                  <small class="text-muted">Assignments</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <h3 class="text-warning">{{ item.avg_per_faculty }}</h3>
+                <small class="text-muted">Avg/Faculty</small>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="progress" style="height: 25px;">
+              {% if item.faculty_count > 0 %}
+                {% widthratio item.confirmed_assignments item.total_assignments 100 as confirm_pct %}
+                <div class="progress-bar bg-success" role="progressbar" 
+                     style="width: {{ confirm_pct }}%"
+                     aria-valuenow="{{ confirm_pct }}" aria-valuemin="0" aria-valuemax="100">
+                  {{ item.confirmed_assignments }} Confirmed
+                </div>
+              {% else %}
+                <div class="progress-bar bg-secondary" style="width: 100%">
+                  No Data
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info text-center">
+          <i class="fas fa-info-circle fa-2x mb-2"></i>
+          <p class="mb-0">No department data available for selected period</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Comparison Table -->
+  <div class="card mt-4">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0"><i class="fas fa-table"></i> Department Comparison</h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Department</th>
+              <th>Exams</th>
+              <th>Faculty</th>
+              <th>Total Assignments</th>
+              <th>Confirmed</th>
+              <th>Avg per Faculty</th>
+              <th>Workload</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in dept_data %}
+              <tr>
+                <td><strong>{{ item.department.code }}</strong></td>
+                <td>{{ item.total_exams }}</td>
+                <td>{{ item.faculty_count }}</td>
+                <td>{{ item.total_assignments }}</td>
+                <td><span class="badge bg-success">{{ item.confirmed_assignments }}</span></td>
+                <td><strong>{{ item.avg_per_faculty }}</strong></td>
+                <td>
+                  {% if item.avg_per_faculty > 10 %}
+                    <span class="badge bg-danger">High</span>
+                  {% elif item.avg_per_faculty > 5 %}
+                    <span class="badge bg-warning text-dark">Medium</span>
+                  {% else %}
+                    <span class="badge bg-success">Low</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

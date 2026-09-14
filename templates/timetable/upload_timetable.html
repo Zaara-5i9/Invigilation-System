@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Timetable{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Upload Timetable (CSV)</h1>
+<p>CSV columns: <code>employee_id, day, start_time, end_time, course_code, course_name, is_lab</code></p>
+<form method="post" enctype="multipart/form-data" class="card card-body shadow-sm" style="max-width: 600px;">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <div class="mb-3">
+    {{ form.file.label_tag }}
+    {{ form.file }}
+    {% if form.file.errors %}
+      <div class="text-danger small">{{ form.file.errors|striptags }}</div>
+    {% endif %}
+  </div>
+  <button type="submit" class="btn btn-primary">Upload</button>
+</form>
+{% endblock %}

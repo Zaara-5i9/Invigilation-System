@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+
+{% block title %}Faculty List{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h1 class="mb-1 fw-bold">
+                <i class="fas fa-users me-3" style="color: #667eea;"></i>
+                Faculty Management
+              </h1>
+              <p class="text-muted mb-0">Manage and view all faculty members</p>
+            </div>
+            <div>
+              <a href="{% url 'accounts:create_faculty_batch' %}" class="btn btn-success btn-lg">
+                <i class="fas fa-user-plus me-2"></i> Create Faculty (Batch)
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0">
+        <div class="card-header text-white border-0">
+          <h5 class="mb-0 fw-bold">
+            <i class="fas fa-search me-2"></i>
+            Search Faculty
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-8">
+              <label class="form-label fw-medium">Search by name, email, or employee ID</label>
+              <input type="text" name="q" class="form-control" placeholder="Enter search term..." value="{{ q }}">
+            </div>
+            <div class="col-md-4">
+              <button type="submit" class="btn btn-primary btn-lg w-100">
+                <i class="fas fa-search me-2"></i> Search
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  {% if page_obj %}
+  <div class="row g-4 mb-4">
+    <div class="col-lg-3 col-md-6">
+      <div class="card h-100 border-0">
+        <div class="card-body text-center p-4">
+          <div class="mb-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle" 
+                 style="width: 70px; height: 70px; background: var(--primary-gradient);">
+              <i class="fas fa-users fa-2x text-white"></i>
+            </div>
+          </div>
+          <h3 class="fw-bold mb-2" style="color: #667eea;">{{ total_faculty_count }}</h3>
+          <p class="text-muted mb-0 fw-medium">Total Faculty</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card h-100 border-0">
+        <div class="card-body text-center p-4">
+          <div class="mb-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle" 
+                 style="width: 70px; height: 70px; background: var(--success-gradient);">
+              <i class="fas fa-user-check fa-2x text-white"></i>
+            </div>
+          </div>
+          <h3 class="fw-bold mb-2" style="color: #4facfe;">
+            {{ active_faculty_count }}
+          </h3>
+          <p class="text-muted mb-0 fw-medium">Active Faculty</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card h-100 border-0">
+        <div class="card-body text-center p-4">
+          <div class="mb-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle" 
+                 style="width: 70px; height: 70px; background: var(--warning-gradient);">
+              <i class="fas fa-key fa-2x text-white"></i>
+            </div>
+          </div>
+          <h3 class="fw-bold mb-2" style="color: #43e97b;">
+            {{ first_login_count }}
+          </h3>
+          <p class="text-muted mb-0 fw-medium">First Login</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card h-100 border-0">
+        <div class="card-body text-center p-4">
+          <div class="mb-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle" 
+                 style="width: 70px; height: 70px; background: var(--info-gradient);">
+              <i class="fas fa-list fa-2x text-white"></i>
+            </div>
+          </div>
+          <h3 class="fw-bold mb-2" style="color: #a8edea;">{{ page_obj.start_index }}-{{ page_obj.end_index }}</h3>
+          <p class="text-muted mb-0 fw-medium">Showing Results</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Faculty Table -->
+  <div class="card border-0">
+    <div class="card-header text-white border-0">
+      <h5 class="mb-0 fw-bold">
+        <i class="fas fa-list me-2"></i>
+        Faculty Directory
+        {% if q %}
+          <span class="badge bg-light text-dark ms-2">Search: "{{ q }}"</span>
+        {% endif %}
+      </h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th class="fw-bold">Faculty Details</th>
+              <th class="fw-bold">Contact Information</th>
+              <th class="fw-bold">Department</th>
+              <th class="fw-bold">Location</th>
+              <th class="fw-bold">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for f in page_obj %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="me-3">
+                      <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                           style="width: 50px; height: 50px; background: var(--primary-gradient);">
+                        <i class="fas fa-user text-white fa-lg"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="fw-bold">{{ f.user.get_full_name|default:f.user.username }}</div>
+                      <div class="small text-muted">ID: {{ f.employee_id }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="fw-bold">{{ f.user.email }}</div>
+                  <div class="small text-muted">
+                    <i class="fas fa-phone me-1"></i>
+                    {{ f.phone_number|default:"Not provided" }}
+                  </div>
+                </td>
+                <td>
+                  <span class="badge px-3 py-2" style="background: var(--success-gradient);">
+                    {{ f.department.code }}
+                  </span>
+                  <div class="small text-muted mt-1">{{ f.department.name }}</div>
+                </td>
+                <td>
+                  {% if f.cabin_block %}
+                    <div class="fw-bold">
+                      <i class="fas fa-map-marker-alt me-1" style="color: #667eea;"></i>
+                      {{ f.cabin_block }} {{ f.cabin_room }}
+                    </div>
+                  {% else %}
+                    <span class="text-muted">Not assigned</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="d-flex flex-column gap-1">
+                    {% if f.is_active %}
+                      <span class="badge bg-success px-3 py-2">
+                        <i class="fas fa-check-circle me-1"></i> Active
+                      </span>
+                    {% else %}
+                      <span class="badge bg-secondary px-3 py-2">
+                        <i class="fas fa-times-circle me-1"></i> Inactive
+                      </span>
+                    {% endif %}
+                    {% if f.must_change_password %}
+                      <span class="badge bg-warning px-3 py-2">
+                        <i class="fas fa-key me-1"></i> First Login
+                      </span>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" class="text-center py-5">
+                  <div class="mb-4">
+                    <i class="fas fa-users fa-4x text-muted opacity-50"></i>
+                  </div>
+                  {% if q %}
+                    <h5 class="text-muted">No faculty found matching "{{ q }}"</h5>
+                    <p class="text-muted mb-4">Try adjusting your search terms</p>
+                    <a href="{% url 'accounts:faculty_list' %}" class="btn btn-primary">
+                      <i class="fas fa-list me-2"></i>View All Faculty
+                    </a>
+                  {% else %}
+                    <h5 class="text-muted">No faculty members found</h5>
+                    <p class="text-muted mb-4">Get started by creating your first faculty member</p>
+                    <a href="{% url 'accounts:create_faculty_batch' %}" class="btn btn-success">
+                      <i class="fas fa-user-plus me-2"></i>Create Faculty
+                    </a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination Controls -->
+  {% if page_obj.has_other_pages %}
+    <div class="row mt-4">
+      <div class="col-12">
+        <nav aria-label="Faculty pagination">
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page=1{% if q %}&q={{ q }}{% endif %}">
+                  <i class="fas fa-angle-double-left me-1"></i> First
+                </a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">
+                  <i class="fas fa-angle-left me-1"></i> Previous
+                </a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">
+                  <i class="fas fa-angle-double-left me-1"></i> First
+                </span>
+              </li>
+              <li class="page-item disabled">
+                <span class="page-link">
+                  <i class="fas fa-angle-left me-1"></i> Previous
+                </span>
+              </li>
+            {% endif %}
+
+            <li class="page-item active">
+              <span class="page-link fw-bold">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+              </span>
+            </li>
+
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}">
+                  Next <i class="fas fa-angle-right ms-1"></i>
+                </a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if q %}&q={{ q }}{% endif %}">
+                  Last <i class="fas fa-angle-double-right ms-1"></i>
+                </a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">
+                  Next <i class="fas fa-angle-right ms-1"></i>
+                </span>
+              </li>
+              <li class="page-item disabled">
+                <span class="page-link">
+                  Last <i class="fas fa-angle-double-right ms-1"></i>
+                </span>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+.pagination .page-link {
+  border-radius: 10px;
+  margin: 0 2px;
+  border: 2px solid rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+  background: var(--primary-gradient);
+  color: white;
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+.pagination .page-item.active .page-link {
+  background: var(--primary-gradient);
+  border-color: #667eea;
+}
+
+.pagination .page-item.disabled .page-link {
+  color: #6c757d;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .pagination .page-item {
+    margin: 2px;
+  }
+  
+  .table-responsive {
+    font-size: 0.9rem;
+  }
+}
+</style>
+{% endblock %}

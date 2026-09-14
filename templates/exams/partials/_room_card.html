@@ -1,0 +1,15 @@
+<div class="col-md-3">
+  <div class="card shadow-sm h-100" {% if tooltip %}data-bs-toggle="tooltip" title="{{ tooltip }}"{% endif %}>
+    <div class="card-body text-center">
+      <h5 class="card-title mb-1">{{ hall.name }}</h5>
+      {% if hall.floor %}
+        <div class="text-muted small">Floor: {{ hall.floor }}</div>
+      {% endif %}
+      {% if tooltip %}
+        <div class="mt-2"><span class="badge bg-info text-dark">Cabins: {{ tooltip }}</span></div>
+      {% else %}
+        <div class="mt-2"><span class="text-muted small">No faculty cabins mapped</span></div>
+      {% endif %}
+    </div>
+  </div>
+</div>

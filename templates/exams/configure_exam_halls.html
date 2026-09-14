@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load timetable_extras %}
+
+{% block title %}Assign Duties - Select Rooms{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Assign Duties - {{ exam.course_code }} {{ exam.course_name }}</h1>
+<p class="text-muted mb-3">
+  Exam date: {{ exam.exam_date }}
+  &middot;
+  Time: {{ exam.start_time }} - {{ exam.end_time }}
+  &middot;
+  Department: {{ exam.department.code }}
+</p>
+
+<form method="post" class="card card-body shadow-sm">
+  {% csrf_token %}
+
+  {% if blocks %}
+    {% for b in blocks %}
+      {% with halls=halls_by_block|dict_get:b %}
+        <h5 class="mt-2 mb-2">Block {{ b }}</h5>
+        <div class="row g-2 mb-3">
+        {% for hall in halls %}
+          <div class="col-md-4">
+            <div class="form-check border rounded p-2 h-100">
+              <input class="form-check-input" type="checkbox" name="hall_ids" value="{{ hall.id }}" id="hall_{{ hall.id }}">
+              <label class="form-check-label" for="hall_{{ hall.id }}">
+                <strong>{{ hall.name }}</strong>
+                {% if hall.floor %}<br><span class="text-muted small">Floor: {{ hall.floor }}</span>{% endif %}
+                {% if hall.capacity %}<br><span class="text-muted small">Capacity: {{ hall.capacity }}</span>{% endif %}
+                <div class="mt-1">
+                  <label for="req_{{ hall.id }}" class="form-label small">Required invigilators:</label>
+                  <input type="number" name="req_{{ hall.id }}" id="req_{{ hall.id }}" class="form-control form-control-sm" min="1" value="1">
+                </div>
+              </label>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-muted small mb-0">No rooms defined in this block.</p>
+        {% endfor %}
+        </div>
+      {% endwith %}
+    {% endfor %}
+
+    <div class="mt-3">
+      <button type="submit" class="btn btn-success">Save Rooms &amp; Auto-Assign Duties</button>
+      <a href="{% url 'exams:exam_detail' exam.pk %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  {% else %}
+    <p class="text-muted mb-0">No blocks/rooms defined yet. Add rooms in "Manage Blocks / Rooms" first.</p>
+  {% endif %}
+</form>
+{% endblock %}

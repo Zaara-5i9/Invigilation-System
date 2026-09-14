@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Allocation Overview{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Allocation Overview</h1>
+
+<form method="get" class="row g-3 mb-4" style="max-width: 600px;">
+  <div class="col-md-6">
+    <label class="form-label" for="id_date">Exam Date</label>
+    <select name="date" id="id_date" class="form-select">
+      <option value="">All dates</option>
+      {% for d in dates %}
+        <option value="{{ d|date:'Y-m-d' }}" {% if filter_date == d|date:'Y-m-d' %}selected{% endif %}>{{ d }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label" for="id_block">Block</label>
+    <select name="block" id="id_block" class="form-select">
+      <option value="">All blocks</option>
+      {% for b in blocks %}
+        <option value="{{ b }}" {% if filter_block == b %}selected{% endif %}>{{ b }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2 d-flex align-items-end">
+    <button type="submit" class="btn btn-primary w-100">Filter</button>
+  </div>
+</form>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Course</th>
+      <th>Hall</th>
+      <th>Block</th>
+      <th>Faculty</th>
+      <th>Dept</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in assignments %}
+      <tr>
+        <td>{{ a.exam_session_hall.exam.exam_date }}</td>
+        <td>{{ a.exam_session_hall.exam.start_time }} - {{ a.exam_session_hall.exam.end_time }}</td>
+        <td>{{ a.exam_session_hall.exam.course_code }} - {{ a.exam_session_hall.exam.course_name }}</td>
+        <td>{{ a.exam_session_hall.hall.name }}</td>
+        <td>{{ a.exam_session_hall.hall.block }}</td>
+        <td>{{ a.faculty.user.get_full_name|default:a.faculty.user.username }}</td>
+        <td>{{ a.faculty.department.code }}</td>
+        <td>
+          {% if a.status == 'PENDING_CONFIRMATION' %}
+            <span class="badge bg-warning text-dark">Pending</span>
+          {% elif a.status == 'CONFIRMED' %}
+            <span class="badge bg-success">Confirmed</span>
+          {% elif a.status == 'DECLINED' %}
+            <span class="badge bg-danger">Declined</span>
+          {% elif a.status == 'CANCELLED' %}
+            <span class="badge bg-secondary">Cancelled</span>
+          {% elif a.status == 'REASSIGNED' %}
+            <span class="badge bg-info text-dark">Reassigned</span>
+          {% else %}
+            <span class="badge bg-light text-dark">{{ a.status }}</span>
+          {% endif %}
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="8" class="text-center p-3">No allocations found for the selected filters.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

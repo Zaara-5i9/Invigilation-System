@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Notification Preferences{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-cog"></i> Notification Preferences</h2>
+    <a href="{% url 'notifications:notification_list' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Back to Notifications
+    </a>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    
+    <div class="card mb-3">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-envelope"></i> Email Notifications</h5>
+      </div>
+      <div class="card-body">
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="email_new_assignment" id="email_new_assignment"
+                 {% if preferences.email_new_assignment %}checked{% endif %}>
+          <label class="form-check-label" for="email_new_assignment">
+            <strong>New Assignment</strong> - Receive email when assigned new invigilation duty
+          </label>
+        </div>
+        
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="email_assignment_reminder" id="email_assignment_reminder"
+                 {% if preferences.email_assignment_reminder %}checked{% endif %}>
+          <label class="form-check-label" for="email_assignment_reminder">
+            <strong>Assignment Reminders</strong> - Receive reminder emails before deadline
+          </label>
+        </div>
+        
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="email_leave_status" id="email_leave_status"
+                 {% if preferences.email_leave_status %}checked{% endif %}>
+          <label class="form-check-label" for="email_leave_status">
+            <strong>Leave Status</strong> - Receive email when leave is approved/rejected
+          </label>
+        </div>
+        
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="email_system_announcements" id="email_system_announcements"
+                 {% if preferences.email_system_announcements %}checked{% endif %}>
+          <label class="form-check-label" for="email_system_announcements">
+            <strong>System Announcements</strong> - Receive important system updates
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fas fa-bell"></i> In-App Notifications</h5>
+      </div>
+      <div class="card-body">
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="inapp_new_assignment" id="inapp_new_assignment"
+                 {% if preferences.inapp_new_assignment %}checked{% endif %}>
+          <label class="form-check-label" for="inapp_new_assignment">
+            <strong>New Assignment</strong> - Show notification for new assignments
+          </label>
+        </div>
+        
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="inapp_assignment_reminder" id="inapp_assignment_reminder"
+                 {% if preferences.inapp_assignment_reminder %}checked{% endif %}>
+          <label class="form-check-label" for="inapp_assignment_reminder">
+            <strong>Assignment Reminders</strong> - Show reminder notifications
+          </label>
+        </div>
+        
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="inapp_leave_status" id="inapp_leave_status"
+                 {% if preferences.inapp_leave_status %}checked{% endif %}>
+          <label class="form-check-label" for="inapp_leave_status">
+            <strong>Leave Status</strong> - Show notification for leave status changes
+          </label>
+        </div>
+        
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="inapp_system_announcements" id="inapp_system_announcements"
+                 {% if preferences.inapp_system_announcements %}checked{% endif %}>
+          <label class="form-check-label" for="inapp_system_announcements">
+            <strong>System Announcements</strong> - Show system announcements
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Digest Emails</h5>
+      </div>
+      <div class="card-body">
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="daily_digest" id="daily_digest"
+                 {% if preferences.daily_digest %}checked{% endif %}>
+          <label class="form-check-label" for="daily_digest">
+            <strong>Daily Digest</strong> - Receive daily summary of activities
+          </label>
+        </div>
+        
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="weekly_digest" id="weekly_digest"
+                 {% if preferences.weekly_digest %}checked{% endif %}>
+          <label class="form-check-label" for="weekly_digest">
+            <strong>Weekly Digest</strong> - Receive weekly summary of activities
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-grid gap-2">
+      <button type="submit" class="btn btn-primary btn-lg">
+        <i class="fas fa-save"></i> Save Preferences
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
